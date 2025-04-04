@@ -45,8 +45,14 @@ export class User {
   @Column()
   day_left: number;
 
-  @Column({ type: 'text', nullable: true }) 
+  @Column({ type: 'text', nullable: true })
   token: string | null;
+
+  @Column({ nullable: true, type: 'varchar' }) // ✅ Allowing null
+  otp: string | null;
+
+  @Column({ nullable: true, type: 'timestamp' }) // ✅ Allowing null
+  otpExpiry: Date | null;
 
   @BeforeInsert()
   async hashPassword() {
@@ -56,5 +62,4 @@ export class User {
   async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
   }
-
 }

@@ -2,7 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,8 +11,10 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import * as nodemailer from 'nodemailer';
+import * as bcrypt from 'bcrypt';
 
-@Injectable()   
+@Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
@@ -84,7 +86,7 @@ export class AuthService {
     user.token = newToken; // Update stored token
     await this.userRepository.save(user); // Save the updated user with new token
 
-    // Return 
+    // Return
     return {
       success: true,
       message: 'User Information Logged In',
@@ -109,16 +111,175 @@ export class AuthService {
   }
 
 
-async logout(userId: string): Promise<{ success: boolean; message: string }> {
-  const user = await this.userRepository.findOne({ where: { user_id: userId } });
+  async logout(userId: string): Promise<{ success: boolean; message: string }> {
+    const user = await this.userRepository.findOne({
+      where: { user_id: userId },
+    });
 
-  if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('User not found');
 
-  user.token = null; // 🚀 Clear the token from the database
-  await this.userRepository.save(user);
+    user.token = null; // Clear the token from the database
+    await this.userRepository.save(user);
 
-  return { success: true, message: 'Logged out successfully' };
-}
+    return { success: true, message: 'Logged out successfully' };
+  }
 
+  // FORGOT PassWord API
+  async forgotPassword(
+    email: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.userRepository.findOne({ where: { email } });
 
+    if (!user) {
+      throw new NotFoundException('User with this email doest not exist');
+    }
+
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generates 6-digit OTP
+    const otpExpiry = new Date();
+    otpExpiry.setMinutes(otpExpiry.getMinutes() + 10); // OTP valid for 5 minutes
+
+    user.otp = otp;
+    user.otpExpiry = otpExpiry;
+    await this.userRepository.save(user);
+
+    //Send OTP via email
+    await this.sendOtpEmail(user.email, otp);
+
+    return {
+      success: true,
+      message: 'OTP has been sent on Email',
+    };
+  }
+
+  private async sendOtpEmail(email: string, otp: string): Promise<void> {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.SENDER_APP_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: 'Password Reset OTP',
+      text: `Your OTP for password reset is: ${otp}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
+
+  //Verify OTP API
+
+  async verifyOtp(
+    email: string,
+    otp: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    if (!user.otp || !user.otpExpiry) {
+      throw new BadRequestException('No OTP found, please request again');
+    }
+
+    const now = new Date();
+
+    if (user.otp !== otp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    if (now > user.otpExpiry) {
+      throw new BadRequestException('OTP has expired, please request again');
+    }
+
+    // Clear OTP after successful verification
+    user.otp = null;
+    user.otpExpiry = null;
+    await this.userRepository.save(user);
+
+    return {
+      success: true,
+      message: 'OTP verified successfully',
+    };
+  }
+
+  // Resend OTP API
+
+  async resendOtp(
+    email: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    // Generate new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generates 6-digit OTP
+    const otpExpiry = new Date();
+    otpExpiry.setMinutes(otpExpiry.getMinutes() + 5); // OTP valid for 5 minutes
+
+    user.otp = otp;
+    user.otpExpiry = otpExpiry;
+    await this.userRepository.save(user);
+
+    // Send OTP via email
+    await this.sendEmail(user.email, otp);
+
+    return {
+      success: true,
+      message: 'OTP has been sent on mail',
+    };
+  }
+
+  private async sendEmail(email: string, otp: string) {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.SENDER_APP_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: 'Resend OTP Request',
+      text: `Your new OTP is: ${otp}. It is valid for 5 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
+
+  //Reset Password API
+  async resetPassword(
+    email: string,
+    password: string,
+    confirm_password: string,
+  ): Promise<{ success: boolean; message: string }> {
+    if (password !== confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('Invalild User');
+    }
+
+    // Hash the new Password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+
+    // Clear OTP fields after reset
+    user.otp = null as any;
+    user.otpExpiry = null as any;
+
+    await this.userRepository.save(user);
+
+    return {
+      success: true,
+      message: 'Password Changed Successfully',
+    };
+  }
 }

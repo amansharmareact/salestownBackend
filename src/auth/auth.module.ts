@@ -7,9 +7,13 @@ import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // makes env variables available across the app
+    }),
     TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
