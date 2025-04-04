@@ -45,8 +45,8 @@ export class User {
   @Column()
   day_left: number;
 
-  @Column({ nullable: true }) // New column for storing JWT
-  token: string;
+  @Column({ type: 'text', nullable: true }) 
+  token: string | null;
 
   @BeforeInsert()
   async hashPassword() {
