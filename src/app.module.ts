@@ -15,7 +15,11 @@ import { User } from './auth/entities/user.entity';
       password: process.env.DB_PASS || 'root',
       database: process.env.DB_NAME || 'authdb',
       entities: [User],
-      synchronize: true,  // Auto-creates tables (Only for development)
+      ssl: {
+        rejectUnauthorized: false, // ← required for Render
+      },
+      autoLoadEntities: true,
+      synchronize: false,  // Auto-creates tables (Only for development)
     }),
     AuthModule,
   ],
