@@ -15,10 +15,10 @@ import { User } from './auth/entities/user.entity';
       password: process.env.DB_PASS || 'root',
       database: process.env.DB_NAME || 'authdb',
       entities: [User],
-      synchronize: false,  // Set true only in dev
+      synchronize: false,
       ssl: {
-        rejectUnauthorized: false,
-      }
+        rejectUnauthorized: false
+      }  // Set true only in dev
     }),    
     AuthModule,
   ],
