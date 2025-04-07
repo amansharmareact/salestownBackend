@@ -54,6 +54,9 @@ export class User {
   @Column({ nullable: true, type: 'timestamp' }) // ✅ Allowing null
   otpExpiry: Date | null;
 
+  @Column({ default: true })
+  can_change_password: boolean;
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);

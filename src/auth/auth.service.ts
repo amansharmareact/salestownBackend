@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,8 +12,10 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import * as nodemailer from 'nodemailer';
 import * as bcrypt from 'bcrypt';
+import { TogglePasswordChangeDto } from './dto/toggle-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -80,7 +83,7 @@ export class AuthService {
     }
 
     // Invalidate previous session by replacing the token
-    const payload = { sub: user.user_id, email: user.email };
+    const payload = { sub: user.user_id, email: user.email, role: user.role, };
     const newToken = this.jwtService.sign(payload, { expiresIn: '1h' });
 
     user.token = newToken; // Update stored token
@@ -282,4 +285,86 @@ export class AuthService {
       message: 'Password Changed Successfully',
     };
   }
+
+  // GEt PRofile
+  async getProfile(userPayload: any) {
+    const user = await this.userRepository.findOne({ where: { user_id: userPayload.user_id } });
+  
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    return {
+      success: "true",
+      message: "User Profile",
+      data: {
+        user_id: user.user_id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        company_id: user.company_id,
+        company_name: user.companyName,
+        customer_id: user.customer_id,
+        timezone: "Pacific/Auckland",
+        financial_year: "1 April - 31 March",
+        role_id: 1,
+        role: user.role,
+        day_left: user.day_left,
+        image: user.image,
+        currency_id: user.currency_id,
+        currency_icon: "<i class=\"fa fa-usd\"></i>",
+        currency_unicode: "&#36;",
+        currency_name: user.currencyName,
+        can_change_password: "true"
+      }
+    };
+  }
+
+  // Users Can Change their password
+  async changePassword(user: any, dto: ChangePasswordDto) {
+    const currentUser = await this.userRepository.findOne({ where: { user_id: user.user_id } });
+  
+    if (!currentUser) {
+      throw new UnauthorizedException('User not found');
+    }
+  
+    if (!currentUser.can_change_password) {
+      throw new ForbiddenException('Password change is disabled for this user');
+    }
+  
+    const isMatch = await currentUser.validatePassword(dto.old_password);
+    if (!isMatch) {
+      throw new BadRequestException('Old password is incorrect');
+    }
+  
+    if (dto.password !== dto.confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+  
+    currentUser.password = await bcrypt.hash(dto.password, 10);
+    await this.userRepository.save(currentUser);
+  
+    return {
+      success: 'true',
+      message: 'Password changed successfully',
+    };
+  }
+
+  // an admin-only API to enable/disable a user’s ability to change their password by 
+  // updating the can_change_password field in the database.
+  async togglePasswordChange(user_id: string, dto: TogglePasswordChangeDto) {
+    const user = await this.userRepository.findOne({ where: { user_id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    user.can_change_password = dto.can_change_password;
+    await this.userRepository.save(user);
+  
+    return {
+      success: 'true',
+      message: 'Password change permission updated',
+    };
+  }
+    
 }

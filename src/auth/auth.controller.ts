@@ -1,9 +1,23 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Req,
+  UseGuards,
+  Patch,
+  Param,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { TogglePasswordChangeDto } from './dto/toggle-password.dto';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -49,5 +63,29 @@ export class AuthController {
     @Body('confirm_password') confirm_password: string,
   ) {
     return this.authService.resetPassword(email, password, confirm_password);
+  }
+
+  // Only accessible to authenticated users with a valid JWT
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  async getProfile(@Req() req) {
+    return this.authService.getProfile(req.user);
+  }
+
+  // Users have access to change theie Password
+  @UseGuards(AuthGuard('jwt'))
+  @Post('change-password')
+  async changePassword(@Req() req, @Body() dto: ChangePasswordDto) {
+    return this.authService.changePassword(req.user, dto);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin') // Only admin can access this
+  @Patch('toggle-password-change/:user_id')
+  async togglePasswordChange(
+    @Param('user_id') user_id: string,
+    @Body() dto: TogglePasswordChangeDto,
+  ) {
+    return this.authService.togglePasswordChange(user_id, dto);
   }
 }
