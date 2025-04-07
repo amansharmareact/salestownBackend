@@ -33,13 +33,14 @@ export class AuthService {
     if (existingUser) {
       throw new BadRequestException('User already exists with this email');
     }
-
+    
     const user = this.userRepository.create({
       ...createUserDto,
       day_left: 30, // Default value
     });
 
     await this.userRepository.save(user);
+  
 
     // Generate JWT Token
     const payload = { sub: user.user_id, email: user.email, role: user.role };
@@ -139,8 +140,9 @@ export class AuthService {
 
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generates 6-digit OTP
+
     const otpExpiry = new Date();
-    otpExpiry.setMinutes(otpExpiry.getMinutes() + 10); // OTP valid for 5 minutes
+    otpExpiry.setMinutes(otpExpiry.getMinutes() + 10); // OTP valid for 10  minutes
 
     user.otp = otp;
     user.otpExpiry = otpExpiry;
