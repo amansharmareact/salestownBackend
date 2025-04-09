@@ -18,6 +18,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { TogglePasswordChangeDto } from './dto/toggle-password.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserResponseDto } from './dto/create-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,7 +27,7 @@ export class AuthController {
   @Post('signup')
   async signup(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<LoginResponseDto> {
+  ): Promise<UserResponseDto> {
     return this.authService.signup(createUserDto);
   }
 

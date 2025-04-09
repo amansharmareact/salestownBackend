@@ -56,6 +56,8 @@ export class User {
 
   @Column({ default: true })
   can_change_password: boolean;
+    organizationsAdded: any;
+    id: any;
 
   @BeforeInsert()
   async hashPassword() {

@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entities/user.entity';
+import { OrganizationModule } from './contacts/organization/organization.module';
+import { Organization } from './contacts/organization/entities/organization.entity';
 
 @Module({
   imports: [
@@ -14,13 +16,13 @@ import { User } from './auth/entities/user.entity';
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASS || 'root',
       database: process.env.DB_NAME || 'authdb',
-      entities: [User],
-      synchronize: false,
-      ssl: {
-        rejectUnauthorized: false
-      }  // Set true only in dev
+      entities: [User, Organization],
+      synchronize: true,
     }),    
     AuthModule,
+    OrganizationModule,
   ],
+  //controllers: [AppController],
+  //providers: [AppService],
 })
 export class AppModule {}

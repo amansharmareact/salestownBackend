@@ -16,6 +16,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import * as nodemailer from 'nodemailer';
 import * as bcrypt from 'bcrypt';
 import { TogglePasswordChangeDto } from './dto/toggle-password.dto';
+import { UserResponseDto } from './dto/create-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(createUserDto: CreateUserDto): Promise<LoginResponseDto> {
+  async signup(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const existingUser = await this.userRepository.findOne({
       where: { email: createUserDto.email },
     });
@@ -43,11 +44,11 @@ export class AuthService {
   
 
     // Generate JWT Token
-    const payload = { sub: user.user_id, email: user.email, role: user.role };
-    const token = this.jwtService.sign(payload);
+    //const payload = { sub: user.user_id, email: user.email, role: user.role };
+    //const token = this.jwtService.sign(payload);
 
     // Store token in the database
-    user.token = token;
+    //user.token = token;
     await this.userRepository.save(user);
 
     return {
@@ -60,7 +61,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        token: user.token,
+       // token: user.token,
         customer_id: user.customer_id,
         role: user.role,
         day_left: user.day_left,
@@ -85,7 +86,7 @@ export class AuthService {
 
     // Invalidate previous session by replacing the token
     const payload = { sub: user.user_id, email: user.email, role: user.role, };
-    const newToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const newToken = this.jwtService.sign(payload, { expiresIn: '1d' });
 
     user.token = newToken; // Update stored token
     await this.userRepository.save(user); // Save the updated user with new token
