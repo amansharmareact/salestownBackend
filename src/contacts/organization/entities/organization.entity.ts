@@ -9,8 +9,8 @@ import {
   
   @Entity()
   export class Organization {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
   
     @Column()
     organization_name: string;

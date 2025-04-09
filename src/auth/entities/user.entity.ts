@@ -58,6 +58,14 @@ export class User {
   can_change_password: boolean;
     organizationsAdded: any;
     id: any;
+  timezone: string;
+  financial_year: string;
+  role_id: number;
+  currency_icon: any;
+  currency_unicode: any;
+  currency_name: any;
+  created_at: any;
+  updated_at: any;
 
   @BeforeInsert()
   async hashPassword() {

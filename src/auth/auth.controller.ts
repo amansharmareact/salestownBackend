@@ -25,9 +25,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signup(
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<UserResponseDto> {
+  async signup(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     return this.authService.signup(createUserDto);
   }
 
@@ -67,10 +65,11 @@ export class AuthController {
   }
 
   // Only accessible to authenticated users with a valid JWT
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Req() req) {
-    return this.authService.getProfile(req.user);
+    const user_id = req.user.user_id;
+    return this.authService.getProfile(user_id);
   }
 
   // Users have access to change theie Password

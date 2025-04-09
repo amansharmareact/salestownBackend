@@ -290,16 +290,16 @@ export class AuthService {
   }
 
   // GEt PRofile
-  async getProfile(userPayload: any) {
-    const user = await this.userRepository.findOne({ where: { user_id: userPayload.user_id } });
+  async getProfile(user_id: string) {
+    const user = await this.userRepository.findOne({
+      where: { user_id },
+    });
   
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    if (!user) throw new NotFoundException('User not found');
   
     return {
-      success: "true",
-      message: "User Profile",
+      success: true,
+      message: 'User Profile',
       data: {
         user_id: user.user_id,
         name: user.name,
@@ -308,20 +308,23 @@ export class AuthService {
         company_id: user.company_id,
         company_name: user.companyName,
         customer_id: user.customer_id,
-        timezone: "Pacific/Auckland",
-        financial_year: "1 April - 31 March",
-        role_id: 1,
+        timezone: user.timezone || "Pacific/Auckland",
+        financial_year: user.financial_year || "1 April - 31 March",
+        role_id: user.role_id || 1,
         role: user.role,
         day_left: user.day_left,
         image: user.image,
         currency_id: user.currency_id,
-        currency_icon: "<i class=\"fa fa-usd\"></i>",
-        currency_unicode: "&#36;",
-        currency_name: user.currencyName,
-        can_change_password: "true"
-      }
+        currency_icon: user.currency_icon,
+        currency_unicode: user.currency_unicode,
+        currency_name: user.currency_name,
+        can_change_password: "true",
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      },
     };
   }
+  
 
   // Users Can Change their password
   async changePassword(user: any, dto: ChangePasswordDto) {
