@@ -18,6 +18,9 @@ import { Organization } from './contacts/organization/entities/organization.enti
       database: process.env.DB_NAME || 'authdb',
       entities: [User, Organization],
       synchronize: true,
+      ssl:{
+        rejectUnauthorized: false
+      }
     }),    
     AuthModule,
     OrganizationModule,
