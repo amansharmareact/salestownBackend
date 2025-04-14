@@ -8,8 +8,9 @@ import { User } from 'src/auth/entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Organization, User]),
+  imports: [TypeOrmModule.forFeature([Organization, User,]),
   AuthModule, // 👈 needed to access JwtAuthGuard + UserRepository
 ],
   providers: [OrganizationService,JwtService],

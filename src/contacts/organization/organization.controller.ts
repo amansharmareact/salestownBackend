@@ -4,8 +4,6 @@ import {
   Post,
   Body,
   UseGuards,
-  Headers,
-  Param,
   Patch,
   Delete,
   Get,
@@ -16,6 +14,7 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { OrganizationService } from './organization.service';
 import { Req } from '@nestjs/common';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+
 
 @Controller('organization')
 export class OrganizationController {
@@ -35,7 +34,7 @@ export class OrganizationController {
     @Query('org_id') queryId: string,
     @Req() req: any,
   ) {
-    const orgId =  body.org_id || queryId;     //paramId
+    const orgId = body.org_id || queryId; //paramId
     return this.orgService.updateOrganization(orgId, body);
   }
 
@@ -48,11 +47,12 @@ export class OrganizationController {
     @Query('org_id') queryId: string,
     @Req() req: any,
   ) {
-    const org_id = bodyId || queryId; // paramId 
+    const org_id = bodyId || queryId; // paramId
     return this.orgService.deleteOrganization(org_id, req.user);
   }
 
   // View Organization by ID
+
   @Get('view')
   @UseGuards(JwtAuthGuard)
   async viewOrganization(
@@ -70,7 +70,72 @@ export class OrganizationController {
         message: 'Organization ID is required in params, query, or body',
       };
     }
-
     return this.orgService.viewOrganization(orgId, req.user);
   }
+
+  // GET /organization - accepts parameters either as query or in the body
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getOrganizations(@Query() filters: any, @Req() req: any) {
+    const user = req.user;
+    return this.orgService.getOrganizations(filters, user);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+  /** @UseGuards(JwtAuthGuard)
+  @Get('view/:org_id')
+  async viewOrganization(@Param('org_id') orgId: string, @Req() req) {
+    try {
+      const response = await this.orgService.viewOrganization(orgId);
+      return {
+        success: 'true',
+        message: 'Oragnization Data',
+        data: response,
+      };
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+    
+    List ALl ORganizations COntroller
+
+     @Get()
+  @UseGuards(JwtAuthGuard)
+  async listOrganizations(
+    @Query() query: any,
+    @Body() body: any,
+    @Req() req: any
+  ) {
+    // Combine query + body
+    const params = { ...body, ...query };
+    return this.orgService.listOrganizations(params, req.user);
+  }
+
+    */
 }

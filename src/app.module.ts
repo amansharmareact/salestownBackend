@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entities/user.entity';
 import { OrganizationModule } from './contacts/organization/organization.module';
 import { Organization } from './contacts/organization/entities/organization.entity';
+import { PersonModule } from './contacts/person/person.module';
+import { Person } from './contacts/person/entities/person.entity';
 
 @Module({
   imports: [
@@ -16,14 +18,16 @@ import { Organization } from './contacts/organization/entities/organization.enti
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASS || 'root',
       database: process.env.DB_NAME || 'authdb',
-      entities: [User, Organization],
+      entities: [User, Organization,Person],
       synchronize: true,
       ssl:{
-        rejectUnauthorized: false
+        rejectUnauthorized:false,
       }
     }),    
     AuthModule,
     OrganizationModule,
+    PersonModule
+
   ],
   //controllers: [AppController],
   //providers: [AppService],

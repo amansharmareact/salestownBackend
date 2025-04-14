@@ -48,16 +48,16 @@ export class User {
   @Column({ type: 'text', nullable: true })
   token: string | null;
 
-  @Column({ nullable: true, type: 'varchar' }) // ✅ Allowing null
+  @Column({ nullable: true, type: 'varchar' })
   otp: string | null;
 
-  @Column({ nullable: true, type: 'timestamp' }) // ✅ Allowing null
+  @Column({ nullable: true, type: 'timestamp' })
   otpExpiry: Date | null;
 
   @Column({ default: true })
-  can_change_password: boolean;
-    organizationsAdded: any;
-    id: any;
+  can_change_password: boolean; 
+  organizationsAdded: any;
+  id: any;
   timezone: string;
   financial_year: string;
   role_id: number;
@@ -66,6 +66,7 @@ export class User {
   currency_name: any;
   created_at: any;
   updated_at: any;
+  followers: any;
 
   @BeforeInsert()
   async hashPassword() {

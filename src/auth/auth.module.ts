@@ -33,30 +33,3 @@ export class AuthModule {}
 
 
 
-{/**import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { User } from './entities/user.entity';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
-import { ConfigModule } from '@nestjs/config'
-import { JwtAuthGuard } from './jwt-auth.guard';
-
-@Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true,  }),
-      // makes env variables available across the app
-    TypeOrmModule.forFeature([User]),
-    PassportModule,
-    JwtModule.register({
-        secret: process.env.JWT_SECRET , 
-        signOptions: { expiresIn: '1d' }, // Token   valid for 1 day
-      }),
-],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  exports: [AuthService, TypeOrmModule,JwtAuthGuard], // 👈 export TypeOrmModule to expose User repository
-})
-export class AuthModule {} */}

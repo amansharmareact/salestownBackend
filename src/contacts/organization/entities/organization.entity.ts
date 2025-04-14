@@ -1,10 +1,14 @@
 // src/organization/entities/organization.entity.ts
+import { User } from 'src/auth/entities/user.entity';
+import { Person } from 'src/contacts/person/entities/person.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -63,8 +67,12 @@ export class Organization {
   @Column({ type: 'int', array: true, nullable: true })
   custom_column_value_id: number[];
 
-  @Column({ type: 'int', nullable: true })
-  owner: number;
+  @Column({ type: 'uuid', nullable: true })
+  owner: string;
+
+  @OneToMany(() => Person, (person) => person.organization)
+  persons: Person[];
+
 
   @CreateDateColumn()
   created_at: Date;
