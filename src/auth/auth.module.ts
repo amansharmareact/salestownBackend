@@ -27,7 +27,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  exports: [AuthService, TypeOrmModule,JwtAuthGuard], // 👈 export TypeOrmModule to expose User repository
+  exports: [AuthService, TypeOrmModule,JwtAuthGuard], //export 
 })
 export class AuthModule {}
 

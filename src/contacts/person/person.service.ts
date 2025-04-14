@@ -121,4 +121,118 @@ async viewPerson(params: any, user: any) {
       
     }
   }
+
+  //List ALL Persons
+async listAllPersons(filters: {
+  per_page: number,
+  page: number,
+  search?: string,
+  user_id?: number,
+  start_date?: string,
+  end_date?: string
+}) {
+  const { per_page, page, search, user_id, start_date, end_date } = filters;
+  const skip = (page - 1) * per_page;
+
+  const query = this.personRepo
+    .createQueryBuilder('person')
+    .leftJoinAndSelect('person.organization', 'organization')
+    .orderBy('person.id', 'DESC');
+
+  if (search) {
+    query.andWhere(
+      '(LOWER(person.name) LIKE :search OR LOWER(person.email) LIKE :search OR person.phone LIKE :search)',
+      { search: `%${search.toLowerCase()}%` }
+    );
+  }
+
+  if (user_id) {
+    query.andWhere('person.created_by = :user_id', { user_id });
+  }
+
+  if (start_date) {
+    query.andWhere('person.created_at >= :start_date', { start_date });
+  }
+
+  if (end_date) {
+    query.andWhere('person.created_at <= :end_date', { end_date });
+  }
+
+  const [persons, total] = await query.skip(skip).take(per_page).getManyAndCount();
+
+  const data = persons.map((person) => ({
+    person_id: person.id,
+    person_name: person.person_name || '',
+    email: person.email || '',
+    phone: person.phone || '',
+    organization_name: person.organization?.organization_name || 'no organization',
+  }));
+
+  return {
+    success: 'true',
+    message: 'Persons data',
+    per_page,
+    page,
+    details: {
+      is_prev: page > 1,
+      is_next: page * per_page < total,
+      total_data: total,
+      start: skip + 1,
+      end: skip + data.length,
+    },
+    data,
+  };
+}
+
+//Serach Person
+// person.service.ts
+
+async searchPersons(filters: {
+  per_page: number,
+  page: number,
+  search?: string,
+  organization_id?: number
+}) {
+  const { per_page, page, search, organization_id } = filters;
+  const skip = (page - 1) * per_page;
+
+  const query = this.personRepo
+    .createQueryBuilder('person')
+    .leftJoinAndSelect('person.organization', 'organization')
+    .orderBy('person.id', 'DESC');
+
+  if (search) {
+    query.andWhere(
+      '(LOWER(person.name) LIKE :search OR LOWER(person.email) LIKE :search OR person.phone LIKE :search)',
+      { search: `%${search.toLowerCase()}%` }
+    );
+  }
+
+  if (organization_id) {
+    query.andWhere('person.organization_id = :orgId', { orgId: organization_id });
+  }
+
+  const [persons, total] = await query.skip(skip).take(per_page).getManyAndCount();
+
+  const data = persons.map(p => ({
+    person_id: p.id,
+    name: p.person_name || '',
+    email: p.email || '',
+    phone: p.phone || '',
+  }));
+
+  return {
+    success: 'true',
+    message: 'Person List Fetched',
+    info: {
+      per_page,
+      page,
+      total,
+      is_next: page * per_page < total,
+    },
+    data,
+  };
+}
+
+
 }

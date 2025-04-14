@@ -6,7 +6,6 @@ import { Organization } from './entities/organization.entity';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { User } from 'src/auth/entities/user.entity';
-import { ListOrganizationDto } from './dto/list-organization.dto';
 
 @Injectable()
 export class OrganizationService {
@@ -171,8 +170,8 @@ export class OrganizationService {
       persons: org.persons.map((p) => ({
         person_id: p.id,
         name: p.person_name,
-        email: p.email?.[0] || null,
-        phone: p.phone?.[0] || null,
+        email: p.email,
+        phone: p.phone,
       })),
     }));
   
@@ -191,5 +190,65 @@ export class OrganizationService {
       data: responseData,
     };
   }
+   //Get Organization's City Names 
+  async getOrganizationCities(search?:string){
+    const query = this.organizationRepo
+    .createQueryBuilder('organization')
+    .select('DISTINCT organization.city', 'city')
+    .where('organization.city IS NOT NULL');
+
+    if(search) {
+      query.andWhere('LOWER(organization.city) LIKE :search',{
+        search: `%${search.toLowerCase()}%`,
+      });
+    }
+
+    const cities = await query.orderBy('organization.city', 'ASC').getRawMany();
+
+    return {
+      success: 'true',
+      message: 'Cities List Fetched',
+      data: cities
+    }
+  }
+
+  //Organizations Search
+  async searchOrganizations({per_page, page, search }) {
+    const skip = (page - 1)*per_page;
+
+    const query = this.organizationRepo
+    .createQueryBuilder('org')
+    .where("LOWER(org.organization_name) LIKE :search", { search: `%${search}%` })
+    .orderBy("org.organization_name", "ASC")
+    .skip(skip)
+    .take(per_page);
+
+  const [result , total] = await query.getManyAndCount();
+
+  const searched = result.map((org) => ({
+    org_id: org.id,
+    name: org.organization_name,
+    country: org.country,
+    state: org.state,
+    city: org.city,
+    pincode: org.pincode,
+    address: org.address,
+    address_line_2: org.address_line_2,
+  }))
+
+  return {
+    success: 'true',
+    message: 'Organization List Fetched',
+    info: {
+      per_page: per_page,
+      page,
+      total,
+      is_next: page * per_page < total,
+    },
+    data: searched,
+  }
+  }
   
+  
+
 }

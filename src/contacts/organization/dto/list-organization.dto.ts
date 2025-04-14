@@ -20,7 +20,7 @@ export class ListOrganizationDto {
 
   @IsOptional()
   @IsString()
-  start_date?: string; // Expected format: 'YYYY-MM-DD'
+  start_date?: string; 
 
   @IsOptional()
   @IsString()

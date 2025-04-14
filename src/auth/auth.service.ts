@@ -356,7 +356,7 @@ export class AuthService {
     };
   }
 
-  // an admin-only API to enable/disable a user’s ability to change their password by 
+  // An admin-only API to enable/disable a user’s ability to change their password by 
   // updating the can_change_password field in the database.
   async togglePasswordChange(user_id: string, dto: TogglePasswordChangeDto) {
     const user = await this.userRepository.findOne({ where: { user_id } });

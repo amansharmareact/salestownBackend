@@ -12,17 +12,14 @@ import { Person } from './contacts/person/entities/person.entity';
   imports: [
     ConfigModule.forRoot({ isGlobal: true}),  // Loads environment variables
     TypeOrmModule.forRoot({
-      type: 'postgres',  // ✅ Add this line
+      type: 'postgres',  
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT as string, 10),
-      username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASS || 'root',
-      database: process.env.DB_NAME || 'authdb',
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
       entities: [User, Organization,Person],
       synchronize: true,
-      ssl:{
-        rejectUnauthorized:false,
-      }
     }),    
     AuthModule,
     OrganizationModule,

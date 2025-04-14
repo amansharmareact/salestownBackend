@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Organization, User,]),
-  AuthModule, // 👈 needed to access JwtAuthGuard + UserRepository
+  AuthModule, // access JwtAuthGuard + UserRepository
 ],
   providers: [OrganizationService,JwtService],
   controllers: [OrganizationController],

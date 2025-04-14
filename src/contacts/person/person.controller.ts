@@ -50,4 +50,45 @@ async updatePerson(
  ){
   return this.personService.deletePerson(id);
  }
+
+ //LISt ALL PRSONS
+ // person.controller.ts
+
+@Post('all')
+@UseGuards(JwtAuthGuard)
+async listPersons(
+  @Query() query: any,
+  @Body() body: any,
+  @Req() req
+) {
+  const filters = {
+    per_page: Number(query.per_page || body.per_page || 10),
+    page: Number(query.page || body.page || 1),
+    search: query.search || body.search || '',
+    user_id: Number(query.user_id || body.user_id || null),
+    start_date: query.start_date || body.start_date || null,
+    end_date: query.end_date || body.end_date || null,
+  };
+
+  return this.personService.listAllPersons(filters);
+}
+
+// Search Person 
+
+@Get('search')
+@UseGuards(JwtAuthGuard)
+async searchPersons(
+  @Query() query: any,
+  @Body() body: any
+) {
+  const filters = {
+    per_page: Number(query.per_page || body.per_page || 10),
+    page: Number(query.page || body.page || 1),
+    search: query.search || body.search || '',
+    organization_id: query.organization_id || body.organization_id || null,
+  };
+
+  return this.personService.searchPersons(filters);
+}
+
 }

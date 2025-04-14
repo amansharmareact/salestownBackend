@@ -8,6 +8,7 @@ import {
   Delete,
   Get,
   Query,
+  Search,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -80,62 +81,28 @@ export class OrganizationController {
     const user = req.user;
     return this.orgService.getOrganizations(filters, user);
   }
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{
-  /** @UseGuards(JwtAuthGuard)
-  @Get('view/:org_id')
-  async viewOrganization(@Param('org_id') orgId: string, @Req() req) {
-    try {
-      const response = await this.orgService.viewOrganization(orgId);
-      return {
-        success: 'true',
-        message: 'Oragnization Data',
-        data: response,
-      };
-    } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-    
-    List ALl ORganizations COntroller
-
-     @Get()
+  //GEt Organization Based Cities
+  @Get('cities')
   @UseGuards(JwtAuthGuard)
-  async listOrganizations(
-    @Query() query: any,
-    @Body() body: any,
-    @Req() req: any
+  async getOraganizationCities(
+    @Query('search') search:string
   ) {
-    // Combine query + body
-    const params = { ...body, ...query };
-    return this.orgService.listOrganizations(params, req.user);
+    return this.orgService.getOrganizationCities(search)
   }
 
-    */
+  //GEt organization By Search
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async searchOrganizations(
+    @Query('per_page') per_page= 10,
+    @Query('page') page=1,
+    @Query('search') search='',
+  ) {
+    return this.orgService.searchOrganizations({
+      per_page: +per_page,
+      page: +page,
+      search,
+    })
+  }
 }
