@@ -20,6 +20,9 @@ import { Person } from './contacts/person/entities/person.entity';
       database: process.env.DB_NAME,
       entities: [User, Organization,Person],
       synchronize: true,
+      ssl:{
+        rejectUnauthorized:false
+      }
     }),    
     AuthModule,
     OrganizationModule,
