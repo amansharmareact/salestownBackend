@@ -68,6 +68,10 @@ export class User {
   updated_at: any;
   followers: any;
 
+  @Column({ default: false })
+  is_deleted: boolean;
+
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);

@@ -101,8 +101,8 @@ export class OrganizationController {
   ) {
     return this.orgService.searchOrganizations({
       per_page: +per_page,
-      page: +page,
-      search,
+        page: +page,
+    search,
     })
   }
 }

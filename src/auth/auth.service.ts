@@ -372,5 +372,43 @@ export class AuthService {
       message: 'Password change permission updated',
     };
   }
+
+  async getUsersList(user: any) {
+    if (user.role !== 'admin') {
+      throw new ForbiddenException('Only company admin can view users');
+    }
+  
+    const users = await this.userRepository.find({
+      where: { company_id: user.company_id , is_deleted: false,},
+      select: ['user_id', 'name'], // Only return necessary fields
+    });
+  
+    return {
+      success: 'true',
+      message: 'Users List Fetched',
+      data: users,
+    };
+  }
+  
+  async deleteAccount(userId: string) {
+    const user = await this.userRepository.findOne({ where: { user_id: userId, is_deleted: false  }});
+  
+    if (!user) {
+      throw new NotFoundException('User not found or already deleted');
+    }
     
+    //Hard Delete
+    //await this.userRepository.remove(user);
+
+    //Soft Delete
+    user.is_deleted = true;
+     await this.userRepository.save(user);
+  
+    return {
+      success: "true",
+      message: "Account Deleted Successfully"
+    };
+  }
+  
+  
 }

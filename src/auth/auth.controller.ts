@@ -88,4 +88,19 @@ export class AuthController {
   ) {
     return this.authService.togglePasswordChange(user_id, dto);
   }
+  
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin') // Only allow admin
+  @Get('list')
+  async getUsersList(@Req() req) {
+    const user = req.user;
+    return this.authService.getUsersList(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('delete')
+  async deleteAccount(@Req() req) {
+    const userId = req.user.user_id;
+    return this.authService.deleteAccount(userId);
+  }
 }

@@ -7,6 +7,13 @@ import { OrganizationModule } from './contacts/organization/organization.module'
 import { Organization } from './contacts/organization/entities/organization.entity';
 import { PersonModule } from './contacts/person/person.module';
 import { Person } from './contacts/person/entities/person.entity';
+import { CountryModule } from './general/country/country.module';
+import { Country } from './general/country/entities/country.entity'
+import { StateModule } from './general/state/state.module';
+import { State } from './general/state/entities/state.entity';
+import { CityModule } from './general/city/city.module';
+import { City } from './general/city/entities/city.entity';
+
 
 @Module({
   imports: [
@@ -18,17 +25,21 @@ import { Person } from './contacts/person/entities/person.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [User, Organization,Person],
+      entities: [User, Organization,Person,Country,State,City],
       synchronize: true,
       ssl:{
-        rejectUnauthorized:false
+        rejectUnauthorized: false
       }
+
     }),    
     AuthModule,
     OrganizationModule,
-    PersonModule
-
+    PersonModule,
+    CountryModule,
+    StateModule,
+    CityModule
   ],
+
   //controllers: [AppController],
   //providers: [AppService],
 })
