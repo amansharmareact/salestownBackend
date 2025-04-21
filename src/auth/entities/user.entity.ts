@@ -14,7 +14,7 @@ export class User {
   user_id: string;
 
   @Column('uuid', { nullable: true })
-  customer_id: string | null; // Make customer_id nullable
+  customer_id: string | null; 
 
   @Column('uuid', { nullable: true })
   company_id: string;

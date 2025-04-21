@@ -157,7 +157,6 @@ async viewLead(lead_id: number, user: any) {
   }
   
   //Get Leads
-// src/leads/leads.service.ts
 
 async getLeads(filters: any, user: any) {
     const {
@@ -181,7 +180,7 @@ async getLeads(filters: any, user: any) {
   
     const skip = (page - 1) * per_page;
   
-    // Build your query based on filters
+    //  query based on filters
     const queryBuilder = this.leadRepository.createQueryBuilder('lead')
       .leftJoinAndSelect('lead.organization', 'organization')
       .leftJoinAndSelect('lead.person', 'person')
@@ -191,7 +190,7 @@ async getLeads(filters: any, user: any) {
       queryBuilder.andWhere('lead.title ILIKE :search', { search: `%${search}%` });
     }
   
-    // Add other filters here as needed...
+
   
     queryBuilder.skip(skip).take(per_page);
   

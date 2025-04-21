@@ -34,7 +34,10 @@ import { LeadModule } from './leads/lead.module';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       entities: [User, Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead],
-      synchronize: true,
+      synchronize: false,
+      ssl:{
+        rejectUnauthorized:false
+      }
     }),    
     AuthModule,
     OrganizationModule,
