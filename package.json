@@ -20,8 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:countries": "ts-node src/general/seeds/country.seed.ts",
      "seed:states": "ts-node src/general/seeds/state.seed.ts",
-      "seed:cities": "ts-node src/general/seeds/city.seed.ts"
-     
+      "seed:cities": "ts-node src/general/seeds/city.seed.ts",
+       "seed:pipelines": "ts-node src/general/seeds/pipeline.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

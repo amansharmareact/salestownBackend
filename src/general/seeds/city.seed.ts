@@ -22,7 +22,7 @@ const indianCities = {
   'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur'],
   'Maharashtra': ['Mumbai', 'Pune', 'Nagpur'],
   'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai'],
-  'Uttar Pradesh': ['Noida , Meerut , Baghpat'],
+  'Uttar Pradesh': ['Noida' , 'Meerut' , 'Baghpat'],
   // Add more states and their cities here
 };
 

@@ -9,11 +9,11 @@ export class UserResponseDto {
     email: string;
     phone: string;
     //token: string;
-    customer_id: string;
+    customer_id: string | null;  // Change this to 'string | null'
     role: string;
     day_left: number;
     image: string;
-    currency_id: string;
+    currency_id: string | null;
     currency_icon: string;
     currency_unicode: string;
     currency_name: string;

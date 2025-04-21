@@ -14,6 +14,14 @@ import { State } from './general/state/entities/state.entity';
 import { CityModule } from './general/city/city.module';
 import { City } from './general/city/entities/city.entity';
 
+import { Pipeline } from './pipelines/entities/pipeline.entity';
+import { PipelineStage } from './pipelines/entities/pipeline-stage.entity';
+import { Lead } from './leads/entities/lead.entity';
+import { LeadModule } from './leads/lead.module';
+
+
+
+
 
 @Module({
   imports: [
@@ -25,20 +33,18 @@ import { City } from './general/city/entities/city.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [User, Organization,Person,Country,State,City],
+      entities: [User, Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead],
       synchronize: true,
-      ssl:{
-        rejectUnauthorized: false
-      }
-
     }),    
     AuthModule,
     OrganizationModule,
     PersonModule,
     CountryModule,
     StateModule,
-    CityModule
+    CityModule,
+    LeadModule,
   ],
+
 
   //controllers: [AppController],
   //providers: [AppService],

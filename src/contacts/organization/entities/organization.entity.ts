@@ -1,6 +1,7 @@
 // src/organization/entities/organization.entity.ts
 import { User } from 'src/auth/entities/user.entity';
 import { Person } from 'src/contacts/person/entities/person.entity';
+import { Lead } from 'src/leads/entities/lead.entity';
 import {
   Column,
   Entity,
@@ -73,10 +74,13 @@ export class Organization {
   @OneToMany(() => Person, (person) => person.organization)
   persons: Person[];
 
+  @OneToMany(() => Lead, (lead) => lead.organization)
+  leads: Lead[];
 
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
+    name: null;
 }

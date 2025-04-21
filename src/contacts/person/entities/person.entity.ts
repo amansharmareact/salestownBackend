@@ -7,8 +7,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Organization } from 'src/contacts/organization/entities/organization.entity';
+import { Lead } from 'src/leads/entities/lead.entity';
 
 @Entity()
 export class Person {
@@ -48,6 +50,9 @@ export class Person {
   @JoinColumn({ name: 'organization_id' })
   organization: Organization;
 
+  @OneToMany(() => Lead, (lead) => lead.person)
+  leads: Lead[];
+
   @Column()
   organization_id: string;
 
@@ -56,4 +61,7 @@ export class Person {
 
   @UpdateDateColumn()
   updated_at: Date;
+    name: null;
+    emails: never[];
+    phones: never[];
 }

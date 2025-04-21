@@ -1,18 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BeforeInsert,
+  OneToMany,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Lead } from 'src/leads/entities/lead.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   user_id: string;
 
-  @PrimaryGeneratedColumn('uuid')
-  customer_id: string;
+  @Column('uuid', { nullable: true })
+  customer_id: string | null; // Make customer_id nullable
 
-  @PrimaryGeneratedColumn('uuid')
+  @Column('uuid', { nullable: true })
   company_id: string;
 
-  @PrimaryGeneratedColumn('uuid')
+  @Column('uuid', { nullable: true })
   currency_id: string;
 
   @Column()
@@ -55,7 +62,7 @@ export class User {
   otpExpiry: Date | null;
 
   @Column({ default: true })
-  can_change_password: boolean; 
+  can_change_password: boolean;
   organizationsAdded: any;
   id: any;
   timezone: string;
@@ -71,6 +78,8 @@ export class User {
   @Column({ default: false })
   is_deleted: boolean;
 
+  @OneToMany(() => Lead, (lead) => lead.created_by)
+  leads: Lead[];
 
   @BeforeInsert()
   async hashPassword() {
