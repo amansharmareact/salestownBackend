@@ -36,7 +36,7 @@ import { LeadModule } from './leads/lead.module';
       entities: [User, Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead],
       synchronize: false,
       ssl:{
-        rejectUnauthorized:false
+        rejectUnauthorized:false  //For Deployment
       }
     }),    
     AuthModule,
