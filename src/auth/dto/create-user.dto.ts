@@ -27,9 +27,19 @@ export class CreateUserDto {
   companyName: string;
 
   @IsString()
- // @IsNotEmpty()
- @IsOptional()
+  @IsNotEmpty()
   company_id: string 
+
+  
+  @IsString()
+  @IsNotEmpty()
+  customer_id: string 
+
+  
+  @IsString()
+  @IsNotEmpty()
+  currency_id: string 
+
 
   @IsString()
   countryName: string;

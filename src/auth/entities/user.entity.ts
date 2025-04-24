@@ -13,13 +13,13 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   user_id: string;
 
-  @Column('uuid', { nullable: true })
+  @Column( {type: 'varchar',  nullable: true })
   customer_id: string | null; 
 
-  @Column('uuid', { nullable: true })
+  @Column( { nullable: true })
   company_id: string;
 
-  @Column('uuid', { nullable: true })
+  @Column({ nullable: true })
   currency_id: string;
 
   @Column()

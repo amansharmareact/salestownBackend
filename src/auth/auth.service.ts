@@ -40,8 +40,7 @@ export class AuthService {
       day_left: 30, // Default value
     });
 
-    await this.userRepository.save(user);
-  
+    
 
     // Generate JWT Token
     //const payload = { sub: user.user_id, email: user.email, role: user.role };
@@ -62,7 +61,7 @@ export class AuthService {
         email: user.email,
         phone: user.phone,
        // token: user.token,
-        customer_id: user.customer_id,
+       customer_id: user.customer_id,
         role: user.role,
         day_left: user.day_left,
         image: user.image,
