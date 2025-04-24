@@ -100,6 +100,6 @@ const seed = async () => {
 };
 
 seed().catch((error) => {
-  console.error('❌ Error seeding pipelines:', error);
+  console.error('Error seeding pipelines:', error);
   process.exit(1);
 });

@@ -9,9 +9,14 @@ import { Organization } from 'src/contacts/organization/entities/organization.en
 import { Person } from 'src/contacts/person/entities/person.entity';
 import { PipelineStage } from 'src/pipelines/entities/pipeline-stage.entity';
 import { Pipeline } from 'src/pipelines/entities/pipeline.entity';
+import { Country } from 'src/general/country/entities/country.entity';
+import { City } from 'src/general/city/entities/city.entity';
+import { State } from 'src/general/state/entities/state.entity';
+import { LeadAttachment } from './entities/lead-attachment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Lead,User, Organization,Person,Pipeline,PipelineStage]),JwtModule.register({}), ],
+  imports: [TypeOrmModule.forFeature([Lead,PipelineStage,User,Organization,Person,Pipeline,Country,City,State,LeadAttachment]),
+  JwtModule.register({}), ],
   controllers: [LeadController],
   providers: [LeadService],
 })

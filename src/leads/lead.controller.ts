@@ -1,8 +1,13 @@
-import { Controller, Post, Body, Headers, UseGuards, Req, Get, Param, ParseIntPipe, Patch, Delete, Query } from '@nestjs/common';
+import { Controller, Post, Body, Headers, UseGuards, Req, Get, Param, ParseIntPipe, Patch, Delete, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { LeadService } from './lead.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UpdateLeadDto } from './dto/update-lead.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
+import { multerConfig } from './utils/multer.config';
+
 
 @Controller('leads')
 export class LeadController {
@@ -59,18 +64,31 @@ async getLeads(
   return this.leadService.getLeads(query, req.user);
 }
 
-
-
-  
+//Filter Leads
+@Get('/filter')
+@UseGuards(JwtAuthGuard)
+async getLeadFilters(@Req() req) {
+  return this.leadService.getLeadFilters(req.user);
 }
 
-{/**
-    @Get()
+
 @UseGuards(JwtAuthGuard)
-async listLeads(
-  @Query() query: any,
-  @Req() req: any,
+@Post('attach/:lead_id')
+@UseInterceptors(FileInterceptor('file', multerConfig))
+async uploadLeadFile(
+  @Param('lead_id') lead_id: number,
+  @UploadedFile() file: Express.Multer.File,
 ) {
-const user = req.user; 
-  return await this.leadService.getLeads(query, req.user);
-} */}
+  await this.leadService.attachFileToLead(lead_id, file);
+
+  return {
+    success: 'true',
+    message: 'Attachment added',
+  };
+}
+
+//Lead Lost from
+
+
+}
+

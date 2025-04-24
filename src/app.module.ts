@@ -18,6 +18,7 @@ import { Pipeline } from './pipelines/entities/pipeline.entity';
 import { PipelineStage } from './pipelines/entities/pipeline-stage.entity';
 import { Lead } from './leads/entities/lead.entity';
 import { LeadModule } from './leads/lead.module';
+import { LeadAttachment } from './leads/entities/lead-attachment.entity';
 
 
 
@@ -33,11 +34,8 @@ import { LeadModule } from './leads/lead.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [User, Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead],
-      synchronize: false,
-      ssl:{
-        rejectUnauthorized:false  //For Deployment
-      }
+      entities: [User,Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead,LeadAttachment],
+      synchronize: true,
     }),    
     AuthModule,
     OrganizationModule,

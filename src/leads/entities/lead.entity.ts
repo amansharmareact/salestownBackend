@@ -4,6 +4,7 @@ import { Organization } from 'src/contacts/organization/entities/organization.en
 import { Person } from 'src/contacts/person/entities/person.entity';
 import { Pipeline } from 'src/pipelines/entities/pipeline.entity';
 import { PipelineStage } from 'src/pipelines/entities/pipeline-stage.entity';
+import { LeadAttachment } from './lead-attachment.entity';
 
 @Entity()
 export class Lead {
@@ -102,6 +103,12 @@ export class Lead {
 
   @Column({ nullable: true })
 salesperson: string;
+
+// Inside your Lead entity
+
+@OneToMany(() => LeadAttachment, (attachment) => attachment.lead)
+attachments: LeadAttachment[];
+
 
   @UpdateDateColumn()
   updated_at: Date

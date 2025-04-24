@@ -5,6 +5,12 @@ import { Lead } from './entities/lead.entity';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { Pipeline } from 'src/pipelines/entities/pipeline.entity';
 import { UpdateLeadDto } from './dto/update-lead.dto';
+import { User } from 'src/auth/entities/user.entity';
+import { Country } from 'src/general/country/entities/country.entity';
+import { City } from 'src/general/city/entities/city.entity';
+import { State } from 'src/general/state/entities/state.entity';
+import { LeadAttachment } from './entities/lead-attachment.entity';
+
 
 @Injectable()
 export class LeadService {
@@ -13,6 +19,16 @@ export class LeadService {
     private leadRepository: Repository<Lead>,
     @InjectRepository(Pipeline)
     private pipelineRepository: Repository<Pipeline>,
+    @InjectRepository(User)
+    private userRepository : Repository<User>,
+    @InjectRepository(Country)
+    private readonly countryRepository: Repository<Country>,
+    @InjectRepository(State)
+     private readonly stateRepository: Repository<State>,
+     @InjectRepository(City)
+      private cityRepository: Repository<City>,
+      @InjectRepository(LeadAttachment)
+    private readonly attachmentRepository: Repository<LeadAttachment>,
   ) {}
 
   async createLead(createLeadDto: CreateLeadDto, user: any): Promise<any> {
@@ -212,8 +228,8 @@ async getLeads(filters: any, user: any) {
       tag_name: null,
       tag_color: null,
       tag_color_code: null,
-      salesperson: user.name || 'N/A', //
-      lead_activity_flag: 'warning', //
+      salesperson: user.name || 'N/A',
+      lead_activity_flag: 'warning',
     }));
   
     return {
@@ -240,145 +256,127 @@ async getLeads(filters: any, user: any) {
       data: transformedLeads,
     };
   }
+
+  //Filter LEADS
+  async getLeadFilters(user: any) {
+    const [pipelines, users, countries, states, cities, ] = await Promise.all([  //sources
+      this.pipelineRepository.find({
+        relations: ['pipestages'],
+      }),
+      this.userRepository.find({
+        select: ['user_id', 'name'],
+      }),
+      this.countryRepository.find({
+        select: ['name'],
+      }),
+      this.stateRepository.find({
+        select: ['name'],
+      }),
+      this.cityRepository.find({
+        select: ['name'],
+      }),
+     // this.sourceRepository.find(), // Or hardcoded array if not from DB
+    ]);
+  
+    // Format pipeline with stages
+    const formattedPipelines = pipelines.map((pipeline) => ({
+      id: pipeline.id,
+      name: pipeline.name,
+      pipestages: pipeline.pipestages.map((stage) => ({
+        id: stage.id,
+        name: stage.name,
+      })),
+    }));
+  
+    // Hardcode
+    const leads_type = [
+      { id: 0, value: "All Active leads" },
+      { id: 1, value: "All Won leads" },
+      { id: 2, value: "All Lost leads" },
+      { id: 3, value: "Stage Change due" },
+      { id: 4, value: "More than 1 month old active leads" },
+      { id: 5, value: "More than 3 month old active leads" },
+      { id: 6, value: "All Active Duplicates" },
+    ];
+
+    // Hardcoding pincodes and sources
+    const pincodes = [
+      '88', '201309', '221001', '100200', '20000', '0', '111', '11', '1919',
+      '23456', '66', '2345', '987', '10001', '220001', '22222', '222222', '88888',
+      '34567', '5678', '777', '1970', '11100', '119909', '11340', '221002', '24354',
+      '12232', '110', '123456', '20', '7400', '77', '222', '5000', '200', '501', '100',
+      '8500', '700', '74'
+    ];
+
+    const sources = [
+      { id: 1, value: 'SalesTown' },
+      { id: 2, value: 'Website (API)' },
+      { id: 3, value: 'Web Form' },
+      { id: 4, value: 'Facebook' },
+      { id: 5, value: 'IVR' },
+      { id: 6, value: 'Indiamart' },
+      { id: 7, value: 'Justdial' },
+      { id: 8, value: 'Tradeindia' },
+      { id: 9, value: 'Chatbot' },
+      { id: 10, value: 'WhatsApp' },
+      { id: 11, value: '99 Acres' },
+      { id: 12, value: 'Magic Bricks' },
+      { id: 13, value: 'Housing' },
+    ];
+
+  
+    const response = {
+      success: "true",
+      message: "Lead Filters",
+      fixed: {
+        pipelines: formattedPipelines,
+        users,
+        leads_type,
+      },
+      advance: {
+        countries: countries.map((c) => c.name),
+        states: states.map((s) => s.name),
+        cities: cities.map((c) => c.name),
+        pincodes: pincodes,
+        sources: sources,
+      //  pincodes: await this.getAllUniquePincodes(), // Optional
+      //  source: sources.map((s) => ({
+      //    id: s.id,
+       //   value: s.name,
+      //  })),
+      },
+    };
+  
+    return response;
+  }
+
+  //Attact file with Lead
+  
+  async attachFileToLead(lead_id: number, file: Express.Multer.File) {
+    const lead = await this.leadRepository.findOne({ where: { lead_id } });
+
+    if (!lead) {
+      throw new NotFoundException('Lead not found');
+    }
+
+    const attachment = this.attachmentRepository.create({
+      filename: file.filename,
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      path: file.path,
+      size: file.size,
+      lead,
+      lead_id: lead.lead_id,
+    });
+
+    await this.attachmentRepository.save(attachment);
+  }
+
+  //Lead Lost From
+  
+  
  
   
 }
 
-{/**
-     async getLeads(query: any, user: any,) {
-    const {
-      per_page = 10,
-      page = 1,
-      search,
-      user_id,
-      pipeline_id,
-      pipestage_id,
-      lead_type,
-      country,
-      state,
-      city,
-      pincode,
-      source,
-      start_date,
-      end_date,
-      update_start_date,
-      update_end_date
-    } = query;
-  
-    const take = Number(per_page);
-    const skip = (Number(page) - 1) * take;
-  
-    const qb = this.leadRepository
-      .createQueryBuilder('lead')
-      .leftJoinAndSelect('lead.organization', 'organization')
-      .leftJoinAndSelect('lead.person', 'person')
-      .leftJoinAndSelect('lead.pipeline', 'pipeline')
-      .leftJoinAndSelect('lead.pipelineStage', 'pipelineStage')
-      //.leftJoinAndSelect('lead.salesperson', 'salesperson')
-      .where('1=1');
-  
-    if (search) {
-      qb.andWhere('(lead.title ILIKE :search OR organization.name ILIKE :search OR person.name ILIKE :search)', {
-        search: `%${search}%`
-      });
-    }
-  
-    if (user_id) qb.andWhere('lead.user_id = :user_id', { user_id });
-    if (pipeline_id) qb.andWhere('lead.pipeline_id = :pipeline_id', { pipeline_id });
-    if (pipestage_id) qb.andWhere('lead.pipelineStage_id = :pipelinetage_id', { pipestage_id });
-    if (lead_type) qb.andWhere('lead.lead_type = :lead_type', { lead_type });
-    if (country) qb.andWhere('lead.country = :country', { country });
-    if (state) qb.andWhere('lead.state = :state', { state });
-    if (city) qb.andWhere('lead.city = :city', { city });
-    if (pincode) qb.andWhere('lead.pincode = :pincode', { pincode });
-    if (source) qb.andWhere('lead.source = :source', { source });
-  
-    if (start_date && end_date) {
-      qb.andWhere('lead.created_at BETWEEN :start AND :end', {
-        start: `${start_date} 00:00:00`,
-        end: `${end_date} 23:59:59`,
-      });
-    }
-  
-    if (update_start_date && update_end_date) {
-      qb.andWhere('lead.updated_at BETWEEN :u_start AND :u_end', {
-        u_start: `${update_start_date} 00:00:00`,
-        u_end: `${update_end_date} 23:59:59`,
-      });
-    }
-  
-    const [leads, total] = await qb.skip(skip).take(take).getManyAndCount();
-  
-    const data = leads.map((lead) => ({
-      lead_id: lead.lead_id,
-      title: lead.title,
-      pipeline_id: lead.pipeline?.id,
-      pipestage_id: lead.pipelineStage?.id,
-      value: lead.value,
-      organization_name: lead.organization?.organization_name || 'no organization',
-      person_name: lead.person?.person_name || '',
-      tag_name: lead.tag_name,
-      tag_color: lead.tag_color,
-      tag_color_code: lead.tag_color_code,
-      salesperson: lead.person?.person_name || null,
-      lead_activity_flag: lead.lead_activity_flag || null
-    }));
-  
-    return {
-      success: 'true',
-      message: 'Lead Fetched',
-      userAccess: {
-        is_delete_lead: 0, // You can fetch from permissions table based on user.role
-      },
-      pipelines: await this.getPipelinesWithStages(),
-      info: {
-        is_next: total > skip + take,
-        total_data: total,
-        start: skip + 1,
-        end: Math.min(skip + take, total),
-        total_values: leads.reduce((acc, lead) => acc + Number(lead.value || 0), 0),
-      },
-      data,
-    };
-  }
-  async getPipelinesWithStages() {
-    const pipelines = await this.pipelineRepository.find({
-      relations: ['pipestages'],
-      order: { id: 'ASC' }
-    });
-  
-    return pipelines.map(pipeline => ({
-      id: pipeline.id,
-      name: pipeline.name,
-      pipestages: pipeline.pipestages.map(stage => ({
-        id: stage.id,
-        name: stage.name
-      }))
-    }));
-  }
-  
 
-
-
-
-
-
-
-  async getLeads(user: any, query: any) {
-    const { name, user_id } = user; // or whatever fields you want
-  
-    // For example: Filter leads assigned to the salesperson
-    const leads = await this.leadRepository
-      .createQueryBuilder('lead')
-      .leftJoinAndSelect('lead.pipelineStage', 'pipelineStage')
-      .where('lead.assigned_to = :user_id', { user_id }) // optional filter
-      .getMany();
-  
-    return {
-      success: true,
-      message: 'Leads fetched successfully',
-      data: leads,
-      login_user_name: name, // include the logged-in user's name
-    };
-  }
-   */}
