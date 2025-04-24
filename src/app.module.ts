@@ -36,6 +36,9 @@ import { LeadAttachment } from './leads/entities/lead-attachment.entity';
       database: process.env.DB_NAME,
       entities: [User,Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead,LeadAttachment],
       synchronize: true,
+      ssl:{
+        rejectUnauthorized:false
+      },
     }),    
     AuthModule,
     OrganizationModule,
