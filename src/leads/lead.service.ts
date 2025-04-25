@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Lead } from './entities/lead.entity';
@@ -10,6 +10,9 @@ import { Country } from 'src/general/country/entities/country.entity';
 import { City } from 'src/general/city/entities/city.entity';
 import { State } from 'src/general/state/entities/state.entity';
 import { LeadAttachment } from './entities/lead-attachment.entity';
+import { LeadLostDto } from './dto/lead-lost.dto';
+import { LeadLostSubmitDto } from './dto/lead-lost-submit.dto';
+import { MarkLeadLostDto } from './dto/mark-lead-lost.dto';
 
 
 @Injectable()
@@ -372,11 +375,144 @@ async getLeads(filters: any, user: any) {
     await this.attachmentRepository.save(attachment);
   }
 
-  //Lead Lost From
-  
-  
- 
+
+
+//Lead Won Submit
+async markLeadWon(lead_id: number, body: { 
+  submit_value: number; 
+  discount: number; 
+  won_value: number; 
+  won_check: string[]; 
+}) {
+  // Find the lead by ID
+  const lead = await this.leadRepository.findOne({ where: { lead_id: lead_id } });
+
+  if (!lead) {
+    throw new Error('Lead not found');
+  }
+
+  //  set the respective values
+  lead.is_won = true;  // Assuming this is the column to mark the lead as won
+  lead.submit_value = body.submit_value;
+  lead.discount = body.discount;
+  lead.won_value = body.won_value;
+  lead.won_check = body.won_check;  // Assuming won_check is an array field
+
+  await this.leadRepository.save(lead);
+
+  return {
+    success: 'true',
+    message: 'Lead Won',
+  };
+}
+
+async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
+  const { lost_reason_id,lost_reason, comment } = markLeadLostDto;
+
+  const lead = await this.leadRepository.findOne({ where: { lead_id } });
+
+  if (!lead) {
+    throw new NotFoundException('Lead not found');
+  }
+
+  // Mark the lead as lost with the provided reason and comment
+  lead.lost_reason_id = lost_reason_id;
+  lead.lost_reason = lost_reason;
+  lead.comment = comment;
+
+  await this.leadRepository.save(lead);
+}
   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{/**
+    //Lead Lost From
+  // leads.service.ts
+
+async markLeadAsLost(lead_id: number, dto: LeadLostDto, userId: string) {
+  const lead = await this.leadRepository.findOne({ where: { lead_id } });
+
+  if (!lead) {
+    throw new NotFoundException('Lead not found');
+  }
+
+  // Optional: check if user is allowed to update this lead
+  if (lead.created_by_user_id !== userId) {
+    throw new ForbiddenException('You are not allowed to mark this lead as lost');
+  }
+
+  lead.reason = dto.reason;
+  lead.reason_id = dto.reason_id;
+  lead.subreason = dto.subreason;
+  lead.subreason_id = dto.subreason_id;
+  lead.comment = dto.comment;
+  lead.is_lost = true;
+
+  await this.leadRepository.save(lead);
+
+  return {
+    success: 'true',
+    message: 'Lead marked as lost',
+    data: {
+      reason: lead.reason,
+      reason_id: lead.reason_id,
+      subreason: lead.subreason,
+      subreason_id: lead.subreason_id,
+      comment: lead.comment,
+    },
+  };
+}
+
+//LEAD LOST Submit
+// src/leads/lead.service.ts
+
+async submitLostLead(lead_id: number, dto: LeadLostSubmitDto, user: any) {
+  const lead = await this.leadRepository.findOne({ where: { lead_id: lead_id } });
+  if (!lead) {
+    throw new NotFoundException('Lead not found');
+  }
+
+  if (!lead.is_lost) {
+    throw new BadRequestException('Lead is not marked as lost');
+  }
+
+  // check if reason_id and sub_reason_id exist
+  const reason = await this.leadRepository.findOne({ where: { reason_id: dto.reason } });
+  if (!reason) {
+    throw new BadRequestException('Invalid reason ID');
+  }
+
+  const subReason = await this.leadRepository.findOne({ where: { subreason_id: dto.sub_reason } });
+  if (!subReason) {
+    throw new BadRequestException('Invalid sub reason ID');
+  }
+
+  lead.reason_id = dto.reason;
+  lead.subreason_id = dto.sub_reason;
+  lead.comment = dto.comment || '';
+  lead.is_lost_submitted = true;
+
+  await this.leadRepository.save(lead);
+
+  return {
+    success: 'success',
+    message: 'Lead lost',
+  };
+} */}
 
 

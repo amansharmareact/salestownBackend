@@ -109,6 +109,32 @@ salesperson: string;
 @OneToMany(() => LeadAttachment, (attachment) => attachment.lead)
 attachments: LeadAttachment[];
 
+// These Columns are for Lead Won 
+@Column({ default: false })
+is_won: boolean;
+
+@Column({ default: 0 })
+submit_value: number;
+
+@Column({ default: 0 })
+discount: number;
+
+@Column({ default: 0 })
+won_value: number;
+
+@Column('text', { array: true, default: []  })
+won_check: string[];  
+
+//These colums are for Lead Lost
+
+@Column({ nullable: true })
+lost_reason_id: number;  // 
+
+@Column({ nullable: true })
+lost_reason: string;  // 
+
+@Column({ nullable: true })
+comment: string;  
 
   @UpdateDateColumn()
   updated_at: Date
@@ -120,3 +146,29 @@ attachments: LeadAttachment[];
     tag_color: any;
     tag_name: any;
 }
+
+
+{/**
+  // lead.entity.ts (continue in your existing class)
+
+@Column({ nullable: true })
+reason: string;
+
+@Column({ nullable: true })
+reason_id: number;
+
+@Column({ nullable: true })
+subreason?: string;
+
+@Column({ nullable: true })
+subreason_id?: number;
+
+@Column({ nullable: true, type: 'text' })
+comment?: string;
+
+@Column({ default: false })
+is_lost: boolean;
+
+@Column({ default: false })
+is_lost_submitted: boolean;
+ */}

@@ -7,6 +7,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 import { multerConfig } from './utils/multer.config';
+import { LeadLostDto } from './dto/lead-lost.dto';
+import { LeadLostSubmitDto } from './dto/lead-lost-submit.dto';
+import { MarkLeadLostDto } from './dto/mark-lead-lost.dto';
 
 
 @Controller('leads')
@@ -87,8 +90,64 @@ async uploadLeadFile(
   };
 }
 
-//Lead Lost from
+//Lead Won Subit or MArk Lead as Won
+@Post('won/:lead_id')
+@UseGuards(JwtAuthGuard)  // Ensure that only authenticated users can mark a lead as won
+async markLeadWon(
+  @Param('lead_id') lead_id: number,
+  @Body() body: { 
+    submit_value: number; 
+    discount: number; 
+    won_value: number; 
+    won_check: string[]; 
+  },
+) {
+  return this.leadService.markLeadWon(lead_id, body);
+}
+
+@UseGuards(JwtAuthGuard)
+@Post('lost/:lead_id')
+async markLeadLost(
+  @Param('lead_id') lead_id: number,
+  @Body() markLeadLostDto: MarkLeadLostDto,
+) {
+  await this.leadService.markLeadAsLost(lead_id, markLeadLostDto);
+
+  return {
+    success: 'success',
+    message: 'Lead lost',
+  };
+}
 
 
 }
 
+
+{/**
+  
+//Lead Lost from
+// leads.controller.ts
+
+@UseGuards(JwtAuthGuard) // JWT Guard
+@Post('lost/:lead_id')
+async markLeadAsLost(
+  @Param('lead_id') lead_id: number,
+  @Body() dto: LeadLostDto,
+  @Req() req : any,
+) {
+  const userId = req.user.user_id;
+  return this.leadService.markLeadAsLost(lead_id, dto, userId);
+}
+
+//Lead Lost Submit
+
+@UseGuards(JwtAuthGuard) // use your JWT Auth Guard
+@Post('/lost/submit/:lead_id')
+async submitLostLead(
+  @Param('lead_id') leadId: number,
+  @Body() dto: LeadLostSubmitDto,
+  @Req() req: any,
+) {
+  return this.leadService.submitLostLead(leadId, dto, req.user);
+}
+ */}
