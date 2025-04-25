@@ -1,6 +1,7 @@
-import { Pipeline } from '../../pipelines/entities/pipeline.entity';
-import { PipelineStage } from '../../pipelines/entities/pipeline-stage.entity'
+import { Pipeline } from '../entities/pipeline.entity';
+import { PipelineStage } from '../entities/pipeline-stage.entity';
 import { DataSource } from 'typeorm';
+//import { Lead } from '../../leads/entities/lead.entity'; // Make sure this path is correct
 
 import * as dotenv from 'dotenv';
 dotenv.config(); 
@@ -13,7 +14,8 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: [Pipeline,PipelineStage], // entities here
+  entities: ['src/**/*.entity{.ts,.js}'], // This will load all entities
+ // entities: [Pipeline,PipelineStage,Lead], // entities here
   synchronize: true, // Keep false to avoid auto-syncing during script execution
 });
 

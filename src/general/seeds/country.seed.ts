@@ -1,6 +1,8 @@
 import { DataSource } from 'typeorm';
 import { Country } from '../country/entities/country.entity';
 import * as dotenv from 'dotenv';
+import { State } from '../state/entities/state.entity';
+import { City } from '../city/entities/city.entity';
 dotenv.config(); 
 
 
@@ -12,7 +14,7 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: [Country], // entities here
+  entities: [Country,State,City], // entities here
   synchronize: false, // Keep false to avoid auto-syncing during script execution
 });
 

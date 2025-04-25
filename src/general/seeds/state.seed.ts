@@ -2,8 +2,10 @@
 import { DataSource } from 'typeorm';
 import { State } from '../state/entities/state.entity';
 import { Country } from '../country/entities/country.entity';
+import { City } from '../city/entities/city.entity';
 
 import * as dotenv from 'dotenv';
+
 dotenv.config();
 
 
@@ -14,7 +16,7 @@ const dataSource = new DataSource({
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    entities: [State,Country],
+    entities: [State,Country,City],
     synchronize: false, 
     logging: true,
 });

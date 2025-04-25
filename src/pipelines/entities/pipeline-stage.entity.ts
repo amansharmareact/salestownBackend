@@ -6,7 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Pipeline } from './pipeline.entity';
-import { Lead } from 'src/leads/entities/lead.entity';
+import { Lead } from '../../leads/entities/lead.entity';
 
 @Entity()
 export class PipelineStage {

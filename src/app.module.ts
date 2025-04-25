@@ -21,9 +21,6 @@ import { LeadModule } from './leads/lead.module';
 import { LeadAttachment } from './leads/entities/lead-attachment.entity';
 
 
-
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true}),  // Loads environment variables
@@ -39,7 +36,7 @@ import { LeadAttachment } from './leads/entities/lead-attachment.entity';
       ssl:{
         rejectUnauthorized:false
       },
-    }),    
+    }),  
     AuthModule,
     OrganizationModule,
     PersonModule,

@@ -26,52 +26,76 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
-    });
+  async signup(createUserDto: CreateUserDto, req?: any): Promise<UserResponseDto> {
+  const { email, role } = createUserDto;
 
-    if (existingUser) {
-      throw new BadRequestException('User already exists with this email');
-    }
-    
-    const user = this.userRepository.create({
-      ...createUserDto,
-      day_left: 30, // Default value
-    });
-
-    
-
-    // Generate JWT Token
-    //const payload = { sub: user.user_id, email: user.email, role: user.role };
-    //const token = this.jwtService.sign(payload);
-
-    // Store token in the database
-    //user.token = token;
-    await this.userRepository.save(user);
-
-    return {
-      success: true,
-      message: 'User Information Registered',
-      data: {
-        user_id: user.user_id,
-        company_id: user.company_id,
-        company_name: user.companyName,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-       // token: user.token,
-       customer_id: user.customer_id,
-        role: user.role,
-        day_left: user.day_left,
-        image: user.image,
-        currency_id: user.currency_id,
-        currency_icon: '<i class="fa fa-usd"></i>',
-        currency_unicode: '&#36;',
-        currency_name: user.currencyName,
-      },
-    };
+  const existingUser = await this.userRepository.findOne({ where: { email } });
+  if (existingUser) {
+    throw new BadRequestException('User already exists with this email');
   }
+
+  let company_id: string = createUserDto.company_id;
+  let companyName: string = createUserDto.companyName;
+
+  // 🛑 If role is 'user', check for admin token
+  if (role === 'user') {
+    const authHeader = req?.headers?.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Admin token required for user signup');
+    }
+
+    const token = authHeader.split(' ')[1];
+    let payload;
+
+    try {
+      payload = this.jwtService.verify(token);
+    } catch (err) {
+      throw new UnauthorizedException('Invalid admin token');
+    }
+
+    const admin = await this.userRepository.findOne({ where: { user_id: payload.sub } });
+
+    if (!admin || admin.role !== 'admin') {
+      throw new ForbiddenException('Only admin can create users');
+    }
+
+    company_id = admin.company_id;
+    companyName = admin.companyName;
+  }
+
+  // ✅ Create user with appropriate company_id
+  const user = this.userRepository.create({
+    ...createUserDto,
+    company_id,
+    companyName,
+    day_left: 30,
+  });
+
+  await this.userRepository.save(user);
+
+  return {
+    success: true,
+    message: 'User Information Registered',
+    data: {
+      user_id: user.user_id,
+      company_id: user.company_id,
+      company_name: user.companyName,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      customer_id: user.customer_id,
+      role: user.role,
+      day_left: user.day_left,
+      image: user.image,
+      currency_id: user.currency_id,
+      currency_icon: '<i class="fa fa-usd"></i>',
+      currency_unicode: '&#36;',
+      currency_name: user.currencyName,
+    },
+  };
+}
+
 
   async login(loginUserDto: LoginUserDto): Promise<any> {
     const { email, password } = loginUserDto;

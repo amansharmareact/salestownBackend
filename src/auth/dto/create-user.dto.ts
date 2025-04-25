@@ -24,10 +24,12 @@ export class CreateUserDto {
   image: string;
 
   @IsString()
+  @IsOptional()
   companyName: string;
 
   @IsString()
-  @IsNotEmpty()
+  //@IsNotEmpty()
+  @IsOptional()
   company_id: string 
 
   

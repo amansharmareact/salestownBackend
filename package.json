@@ -18,10 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "seed:countries": "ts-node src/general/seeds/country.seed.ts",
-    "seed:states": "ts-node src/general/seeds/state.seed.ts",
-    "seed:cities": "ts-node src/general/seeds/city.seed.ts",
-    "seed:pipelines": "ts-node src/general/seeds/pipeline.seed.ts"
+    "seed:countries": "ts-node  --files src/general/seeds/country.seed.ts",
+    "seed:states": "ts-node --files src/general/seeds/state.seed.ts",
+    "seed:cities": "ts-node --files src/general/seeds/city.seed.ts",
+    "seed:pipelines": "ts-node --files src/pipelines/seeds/pipeline.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
