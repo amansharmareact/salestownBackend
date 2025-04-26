@@ -61,7 +61,8 @@ export class LeadService {
         lead_id: lead.lead_id,
       };
     } catch (error) {
-      console.error(' Error creating lead:', error);
+      //console.error(' Error creating lead:', error);
+      console.error('Detailed createLead error:', error);
       throw new Error('Error creating lead');
     }
   }

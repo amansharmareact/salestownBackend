@@ -21,7 +21,7 @@
     "seed:countries": "ts-node  --files src/general/seeds/country.seed.ts",
     "seed:states": "ts-node --files src/general/seeds/state.seed.ts",
     "seed:cities": "ts-node --files src/general/seeds/city.seed.ts",
-    "seed:pipelines": "ts-node --files src/pipelines/seeds/pipeline.seed.ts"
+    "seed:pipelines": "ts-node --files -r tsconfig-paths/register src/pipelines/seeds/pipeline.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

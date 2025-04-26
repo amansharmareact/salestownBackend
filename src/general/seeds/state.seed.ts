@@ -19,6 +19,9 @@ const dataSource = new DataSource({
     entities: [State,Country,City],
     synchronize: false, 
     logging: true,
+    ssl:{
+      rejectUnauthorized:false,
+    }
 });
 
 const indianStates = [

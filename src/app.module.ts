@@ -34,7 +34,7 @@ import { LeadAttachment } from './leads/entities/lead-attachment.entity';
       entities: [User,Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead,LeadAttachment],
       synchronize: true,
       ssl:{
-        rejectUnauthorized:false
+        rejectUnauthorized:false,
       },
     }),  
     AuthModule,

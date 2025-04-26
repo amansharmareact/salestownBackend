@@ -16,6 +16,9 @@ const dataSource = new DataSource({
    database: process.env.DB_NAME,
    entities: [Country,State,City], // entities here
    synchronize: false, // Keep false to avoid auto-syncing during script execution
+   ssl:{
+    rejectUnauthorized:false,
+  }
 });
 
 const indianCities = {

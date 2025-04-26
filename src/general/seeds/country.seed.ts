@@ -15,8 +15,13 @@ const AppDataSource = new DataSource({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   entities: [Country,State,City], // entities here
-  synchronize: false, // Keep false to avoid auto-syncing during script execution
+  synchronize: false, 
+  // Keep false to avoid auto-syncing during script execution
+  ssl:{
+    rejectUnauthorized:false,
+  }
 });
+
 
 const seedCountries = async () => {
   // Initialize TypeORM
