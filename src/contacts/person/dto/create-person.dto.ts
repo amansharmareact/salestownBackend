@@ -1,4 +1,4 @@
-// src/contacts/person/dto/create-person.dto.ts
+
 import {
     IsArray,
     IsNotEmpty,

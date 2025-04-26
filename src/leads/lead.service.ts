@@ -33,6 +33,7 @@ export class LeadService {
     private readonly attachmentRepository: Repository<LeadAttachment>,
   ) {}
 
+  //APi ->> Crete A LEAD
   async createLead(createLeadDto: CreateLeadDto, user: any): Promise<any> {
     try {
       const {
@@ -66,8 +67,7 @@ export class LeadService {
   }
   
 
-  // lead.service.ts
-
+//API ->> View LEAD BY ID
 async viewLead(lead_id: number, user: any) {
     const lead = await this.leadRepository.findOne({
       where: { lead_id: lead_id },
@@ -149,7 +149,7 @@ async viewLead(lead_id: number, user: any) {
     return Math.floor(diff / (1000 * 3600 * 24));
   }
 
-  //Edit Lead
+  //API ->Edit Lead
   async updateLead(lead_id: number, updateLeadDto: UpdateLeadDto): Promise<Lead> {
     const lead = await this.leadRepository.findOne({
         where: { lead_id: lead_id },});
@@ -163,7 +163,7 @@ async viewLead(lead_id: number, user: any) {
     return this.leadRepository.save(lead);
   }
 
-  //Delete a Lead
+  //API -> Delete a Lead
   async deleteLead(lead_id: number): Promise<void> {
     const lead = await this.leadRepository.findOne({ where: { lead_id: lead_id } });
   
@@ -174,7 +174,7 @@ async viewLead(lead_id: number, user: any) {
     await this.leadRepository.remove(lead);
   }
   
-  //Get Leads
+  //API ->Get Leads
 
 async getLeads(filters: any, user: any) {
     const {
@@ -277,10 +277,9 @@ async getLeads(filters: any, user: any) {
       this.cityRepository.find({
         select: ['name'],
       }),
-     // this.sourceRepository.find(), // Or hardcoded array if not from DB
     ]);
   
-    // Format pipeline with stages
+    // pipeline with pipelineStages
     const formattedPipelines = pipelines.map((pipeline) => ({
       id: pipeline.id,
       name: pipeline.name,
@@ -352,7 +351,7 @@ async getLeads(filters: any, user: any) {
     return response;
   }
 
-  //Attact file with Lead
+  //API->> Attact file with Lead
   
   async attachFileToLead(lead_id: number, file: Express.Multer.File) {
     const lead = await this.leadRepository.findOne({ where: { lead_id } });
@@ -376,12 +375,11 @@ async getLeads(filters: any, user: any) {
 
 
 
-//Lead Won Submit
+//API-> MARK LEAD AS WON
 async markLeadWon(lead_id: number, markLeadWonDto:MarkLeadWonDto ) {
 
   const {submit_value , discount, won_value, won_check } = markLeadWonDto
 
-  // Find the lead by ID
   const lead = await this.leadRepository.findOne({ where: { lead_id } });
 
   if (!lead) {
@@ -397,8 +395,8 @@ async markLeadWon(lead_id: number, markLeadWonDto:MarkLeadWonDto ) {
     throw new BadRequestException('You can not Mark this Lead as Won ,This is Already Lost');
   }
 
-  //  set the respective values
-  lead.is_won = true;  // Assuming this is the column to mark the lead as won
+  //  setting respective values
+  lead.is_won = true;  //mark the lead as won
   lead.submit_value = submit_value;
   lead.discount = discount;
   lead.won_value =won_value;
@@ -412,7 +410,7 @@ async markLeadWon(lead_id: number, markLeadWonDto:MarkLeadWonDto ) {
   };
 }
 
-//Lead Won View
+//API -> LEAD WON VIEW
 async getLeadWonView(lead_id: number) {
   const lead = await this.leadRepository.findOne({
     where: { lead_id},
@@ -440,13 +438,13 @@ async getLeadWonView(lead_id: number) {
       discount: lead.discount,
       won_value: lead.won_value,
       won_check: lead.won_check,
-      won_date: lead.updated_at, // Assuming this is when it was marked won
+      won_date: lead.updated_at, 
     },
   };
 }
 
 
-//Mark LEad as Lost
+// API -> MARK LEAD AS LOST
 async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
   const { lost_reason_id,lost_reason, comment } = markLeadLostDto;
 
@@ -473,7 +471,7 @@ async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
   await this.leadRepository.save(lead);
 }
 
-//Lead Lost View
+//API -> LEAD LOST VIEW
 async getLostLeadDetails(lead_id: number) {
   const lead = await this.leadRepository.findOne({
     where: { lead_id },
@@ -493,235 +491,3 @@ async getLostLeadDetails(lead_id: number) {
   
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{/**
-
-//Lead Won Submit
-async markLeadWon(lead_id: number, body: { 
-  submit_value: number; 
-  discount: number; 
-  won_value: number; 
-  won_check: string[]; 
-}) {
-  // Find the lead by ID
-  const lead = await this.leadRepository.findOne({ where: { lead_id:   lead_id } });
-
-  if (!lead) {
-    throw new Error('Lead not found');
-  }
- 
-  if (lead.is_won) {
-    throw new BadRequestException('This lead is Already Marked as Won');
-  }
-
-  if (lead.is_lost) {
-    throw new BadRequestException('This lead is Already Marked as Lost');
-  }
-
-  //  set the respective values
-  lead.is_won = true;  // Assuming this is the column to mark the lead as won
-  lead.submit_value = body.submit_value;
-  lead.discount = body.discount;
-  lead.won_value = body.won_value;
-  lead.won_check = body.won_check;  // Assuming won_check is an array field
-
-  await this.leadRepository.save(lead);
-
-  return {
-    success: 'true',
-    message: 'Lead Won',
-  };
-}
-
-//Lead Won View
-async getLeadWonView(lead_id: number) {
-  const lead = await this.leadRepository.findOne({
-    where: { lead_id},
-    relations: [],
-  });
-
-  if (!lead) {
-    throw new Error('Won lead not found');
-  }
-
-  if (lead.is_lost) {
-    throw new BadRequestException('This lead is not marked as Won');
-  }
-
-  return {
-    success: 'true',
-    message: 'Lead Won View',
-    data: {
-      lead_id: lead.lead_id,
-      name: lead.name,
-      title: lead.title,
-      value: lead.value,
-      submit_value: lead.submit_value,
-      discount: lead.discount,
-      won_value: lead.won_value,
-      won_check: lead.won_check,
-      won_date: lead.updated_at, // Assuming this is when it was marked won
-    },
-  };
-}
-
-
-//Mark LEad as Lost
-async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
-  const { lost_reason_id,lost_reason, comment } = markLeadLostDto;
-
-  const lead = await this.leadRepository.findOne({ where: { lead_id } });
-
-  if (!lead) {
-    throw new NotFoundException('Lead not found');
-  }
-
-  if (lead.is_lost) {
-    throw new BadRequestException('This lead is Already Marked as Lost');
-  }
-
-  if (lead.is_won) {
-    throw new BadRequestException('You can not Mark this Lead as lost ,This Lead is already Won');
-  }
-
-  // Mark the lead as lost with reason and comment
-  lead.is_lost = true;
-  lead.lost_reason_id = lost_reason_id;
-  lead.lost_reason = lost_reason;
-  lead.comment = comment;
-
-  await this.leadRepository.save(lead);
-}
-
-//Lead Lost View
-async getLostLeadDetails(lead_id: number) {
-  const lead = await this.leadRepository.findOne({
-    where: { lead_id },
-    select: ['lead_id', 'name', 'lost_reason_id', 'lost_reason', 'comment', 'is_won'], 
-  });
-
-  if (!lead) {
-    throw new NotFoundException('Lead not found');
-  }
-
-  if (lead.is_won) {
-    throw new BadRequestException('This lead is not marked as lost');
-  }
-
-  return lead;
-}
-  
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //Lead Lost From
-  // leads.service.ts
-
-async markLeadAsLost(lead_id: number, dto: LeadLostDto, userId: string) {
-  const lead = await this.leadRepository.findOne({ where: { lead_id } });
-
-  if (!lead) {
-    throw new NotFoundException('Lead not found');
-  }
-
-  // Optional: check if user is allowed to update this lead
-  if (lead.created_by_user_id !== userId) {
-    throw new ForbiddenException('You are not allowed to mark this lead as lost');
-  }
-
-  lead.reason = dto.reason;
-  lead.reason_id = dto.reason_id;
-  lead.subreason = dto.subreason;
-  lead.subreason_id = dto.subreason_id;
-  lead.comment = dto.comment;
-  lead.is_lost = true;
-
-  await this.leadRepository.save(lead);
-
-  return {
-    success: 'true',
-    message: 'Lead marked as lost',
-    data: {
-      reason: lead.reason,
-      reason_id: lead.reason_id,
-      subreason: lead.subreason,
-      subreason_id: lead.subreason_id,
-      comment: lead.comment,
-    },
-  };
-}
-
-//LEAD LOST Submit
-// src/leads/lead.service.ts
-
-async submitLostLead(lead_id: number, dto: LeadLostSubmitDto, user: any) {
-  const lead = await this.leadRepository.findOne({ where: { lead_id: lead_id } });
-  if (!lead) {
-    throw new NotFoundException('Lead not found');
-  }
-
-  if (!lead.is_lost) {
-    throw new BadRequestException('Lead is not marked as lost');
-  }
-
-  // check if reason_id and sub_reason_id exist
-  const reason = await this.leadRepository.findOne({ where: { reason_id: dto.reason } });
-  if (!reason) {
-    throw new BadRequestException('Invalid reason ID');
-  }
-
-  const subReason = await this.leadRepository.findOne({ where: { subreason_id: dto.sub_reason } });
-  if (!subReason) {
-    throw new BadRequestException('Invalid sub reason ID');
-  }
-
-  lead.reason_id = dto.reason;
-  lead.subreason_id = dto.sub_reason;
-  lead.comment = dto.comment || '';
-  lead.is_lost_submitted = true;
-
-  await this.leadRepository.save(lead);
-
-  return {
-    success: 'success',
-    message: 'Lead lost',
-  };
-} */}
-
-

@@ -1,4 +1,4 @@
-// src/organization/entities/organization.entity.ts
+
 import { User } from 'src/auth/entities/user.entity';
 import { Person } from 'src/contacts/person/entities/person.entity';
 import { Lead } from 'src/leads/entities/lead.entity';

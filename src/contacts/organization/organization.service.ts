@@ -62,7 +62,7 @@ export class OrganizationService {
       throw new NotFoundException('Organization not found');
     }
 
-    // Add role-based or ownership check here
+    // Add role-based 
     // if (org.owner !== user.userId) {
     //   throw new ForbiddenException('You are not authorized to delete this organization');
     // }
@@ -190,6 +190,8 @@ export class OrganizationService {
       data: responseData,
     };
   }
+
+
    //Get Organization's City Names 
   async getOrganizationCities(search?:string){
     const query = this.organizationRepo

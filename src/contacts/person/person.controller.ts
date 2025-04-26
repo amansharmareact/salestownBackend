@@ -1,4 +1,4 @@
-// src/contacts/person/person.controller.ts
+
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PersonService } from './person.service';
@@ -52,7 +52,7 @@ async updatePerson(
  }
 
  //LISt ALL PRSONS
- // person.controller.ts
+
 
 @Post('all')
 @UseGuards(JwtAuthGuard)

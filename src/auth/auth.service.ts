@@ -37,7 +37,7 @@ export class AuthService {
   let company_id: string = createUserDto.company_id;
   let companyName: string = createUserDto.companyName;
 
-  // 🛑 If role is 'user', check for admin token
+  // If role is 'user', check for admin token
   if (role === 'user') {
     const authHeader = req?.headers?.authorization;
 

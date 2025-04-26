@@ -7,7 +7,7 @@ export class CountryController {
   constructor(private readonly countryService: CountryService) {}
 
   @Get('/list')
-  @UseGuards(JwtAuthGuard) // if using JWT
+  @UseGuards(JwtAuthGuard) // using JWT
   async getCountryList(@Body('search') search: string) {
     const countries = await this.countryService.searchCountries(search);
   

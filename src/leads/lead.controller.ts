@@ -60,7 +60,7 @@ async deleteLead(@Param('lead_id') lead_id: number) {
 @Get()
 @UseGuards(JwtAuthGuard)
 async getLeads(
-  @Query() query: any, // or use a DTO 
+  @Query() query: any, // can use a DTO aslo here
   @Req() req: any,
 ) {
   return this.leadService.getLeads(query, req.user);
@@ -89,9 +89,9 @@ async uploadLeadFile(
   };
 }
 
-//Lead Won Subit or MArk Lead as Won
+// MArk Lead as Won
 @Post('won/:lead_id')
-@UseGuards(JwtAuthGuard)  // Ensure that only authenticated users can mark a lead as won
+@UseGuards(JwtAuthGuard)  //only authenticated users can mark a lead as won
 async markLeadWon(
   @Param('lead_id') lead_id: number,
   @Body() markLeadWonDto :MarkLeadWonDto,
@@ -108,7 +108,7 @@ async getLeadWonView(@Param('lead_id') lead_id: number) {
 
 
 //Mark lead as Lost
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard) //only authenticated users can mark a lead as Lost
 @Post('lost/:lead_id')
 async markLeadLost(
   @Param('lead_id') lead_id: number,
@@ -141,32 +141,3 @@ async viewLostLead(
 
 }
 
-
-{/**
-  
-//Lead Lost from
-// leads.controller.ts
-
-@UseGuards(JwtAuthGuard) // JWT Guard
-@Post('lost/:lead_id')
-async markLeadAsLost(
-  @Param('lead_id') lead_id: number,
-  @Body() dto: LeadLostDto,
-  @Req() req : any,
-) {
-  const userId = req.user.user_id;
-  return this.leadService.markLeadAsLost(lead_id, dto, userId);
-}
-
-//Lead Lost Submit
-
-@UseGuards(JwtAuthGuard) // use your JWT Auth Guard
-@Post('/lost/submit/:lead_id')
-async submitLostLead(
-  @Param('lead_id') leadId: number,
-  @Body() dto: LeadLostSubmitDto,
-  @Req() req: any,
-) {
-  return this.leadService.submitLostLead(leadId, dto, req.user);
-}
- */}

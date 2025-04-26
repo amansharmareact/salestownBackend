@@ -1,4 +1,4 @@
-// src/organization/dto/list-organization.dto.ts
+
 import { IsOptional, IsString, IsNumber, IsUUID } from 'class-validator';
 
 export class ListOrganizationDto {

@@ -1,4 +1,4 @@
-// src/organization/organization.controller.ts
+
 import {
   Controller,
   Post,
@@ -74,7 +74,7 @@ export class OrganizationController {
     return this.orgService.viewOrganization(orgId, req.user);
   }
 
-  // GET /organization - accepts parameters either as query or in the body
+  // accepts parameters either as query or in the body
   @Get()
   @UseGuards(JwtAuthGuard)
   async getOrganizations(@Query() filters: any, @Req() req: any) {

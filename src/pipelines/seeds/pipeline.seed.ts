@@ -1,7 +1,7 @@
 import { Pipeline } from '../entities/pipeline.entity';
 import { PipelineStage } from '../entities/pipeline-stage.entity';
 import { DataSource } from 'typeorm';
-//import { Lead } from '../../leads/entities/lead.entity'; // Make sure this path is correct
+
 
 import * as dotenv from 'dotenv';
 dotenv.config(); 
@@ -14,7 +14,7 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: ['src/**/*.entity{.ts,.js}'], // This will load all entities
+  entities: ['src/**/*.entity{.ts,.js}'], // load all entities like this
  // entities: [Pipeline,PipelineStage,Lead], // entities here
   synchronize: true, // Keep false to avoid auto-syncing during script execution
 });
@@ -97,7 +97,7 @@ const seed = async () => {
     await pipelineRepo.save(newPipeline);
   }
 
-  console.log("✅ Pipelines and stages seeded successfully.");
+  console.log("Pipelines and stages seeded successfully.");
   process.exit(0);
 };
 

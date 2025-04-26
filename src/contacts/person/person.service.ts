@@ -184,9 +184,7 @@ async listAllPersons(filters: {
   };
 }
 
-//Serach Person
-// person.service.ts
-
+//Serach Person 
 async searchPersons(filters: {
   per_page: number,
   page: number,

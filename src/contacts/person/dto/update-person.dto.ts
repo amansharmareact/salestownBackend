@@ -1,4 +1,4 @@
-// src/contacts/person/dto/update-person.dto.ts
+
 import {
     IsArray,
     IsNumber,

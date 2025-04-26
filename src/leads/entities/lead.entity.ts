@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Organization } from 'src/contacts/organization/entities/organization.entity';
 import { Person } from 'src/contacts/person/entities/person.entity';
@@ -28,7 +37,7 @@ export class Lead {
   organization_id: string;
 
   @ManyToOne(() => Person, (person) => person.leads)
-  @JoinColumn({ name: 'person_id' })        
+  @JoinColumn({ name: 'person_id' })
   person: Person;
 
   @Column()
@@ -93,7 +102,6 @@ export class Lead {
   @ManyToOne(() => User, (user) => user.leads)
   @JoinColumn({ name: 'created_by_user_id' }) // This maps to column
   created_by: User;
-  
 
   @Column()
   created_by_user_id: string;
@@ -102,76 +110,50 @@ export class Lead {
   created_at: Date;
 
   @Column({ nullable: true })
-salesperson: string;
+  salesperson: string;
 
-// Inside your Lead entity
+  @OneToMany(() => LeadAttachment, (attachment) => attachment.lead)
+  attachments: LeadAttachment[];
 
-@OneToMany(() => LeadAttachment, (attachment) => attachment.lead)
-attachments: LeadAttachment[];
+  // These Columns are for Lead Won
+  @Column({ default: false })
+  is_won: boolean;
 
-// These Columns are for Lead Won 
-@Column({ default: false })
-is_won: boolean;
+  @Column({ default: 0 })
+  submit_value: number;
 
-@Column({ default: 0 })
-submit_value: number;
+  @Column({ default: 0 })
+  discount: number;
 
-@Column({ default: 0 })
-discount: number;
+  @Column({ default: 0 })
+  won_value: number;
 
-@Column({ default: 0 })
-won_value: number;
+  @Column('text', { array: true, default: [] })
+  won_check: string[];
 
-@Column('text', { array: true, default: []  })
-won_check: string[];  
+  //These colums are for Lead Lost
 
-//These colums are for Lead Lost
+  @Column({ default: false })
+  is_lost: boolean;
 
-@Column({ default: false })
-is_lost: boolean;
+  @Column({ nullable: true })
+  lost_reason_id: number; //
 
-@Column({ nullable: true })
-lost_reason_id: number;  // 
+  @Column({ nullable: true })
+  lost_reason: string; //
 
-@Column({ nullable: true })
-lost_reason: string;  // 
-
-@Column({ nullable: true })
-comment: string;  
+  @Column({ nullable: true })
+  comment: string;
 
   @UpdateDateColumn()
-  updated_at: Date
-    source: any;
-    won_probability: string;
-    ownerName: any;
-    lead_activity_flag: null;
-    tag_color_code: any;
-    tag_color: any;
-    tag_name: any;
+  updated_at: Date;
+  source: any;
+  won_probability: string;
+  ownerName: any;
+  lead_activity_flag: null;
+  tag_color_code: any;
+  tag_color: any;
+  tag_name: any;
 }
 
 
-{/**
-  // lead.entity.ts (continue in your existing class)
-
-@Column({ nullable: true })
-reason: string;
-
-@Column({ nullable: true })
-reason_id: number;
-
-@Column({ nullable: true })
-subreason?: string;
-
-@Column({ nullable: true })
-subreason_id?: number;
-
-@Column({ nullable: true, type: 'text' })
-comment?: string;
-
-@Column({ default: false })
-is_lost: boolean;
-
-@Column({ default: false })
-is_lost_submitted: boolean;
- */}

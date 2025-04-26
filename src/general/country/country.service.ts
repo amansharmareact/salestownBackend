@@ -26,21 +26,7 @@ export class CountryService {
       throw new Error('Failed to search countries');
     }
   }
-  
-  
-  
-  
-  
+ 
 }
 
-{/**async searchCountries(search?: string): Promise<Country[]> {
-    const query = this.countryRepository.createQueryBuilder('country');
-  
-    if (search && search.trim() !== '') {
-      query.where('country.name ILIKE :search', { search: `%${search}%` })
-           .orWhere('CAST(country.phonecode AS TEXT) LIKE :search', { search: `%${search}%` });
-    }
-  
-    return query.getMany();
-  }*/}
 

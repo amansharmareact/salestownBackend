@@ -40,20 +40,5 @@ export class CityService {
 
 }
 
-{/**async getCitiesByStateId(stateId: number) {
-    const state = await this.cityRepo.manager.findOne(State, {
-      where: { id: stateId },
-    });
-  
-    if (!state) {
-      console.log(`State with ID ${stateId} not found.`);
-    }
-  
-    return this.cityRepo.find({
-      where: {
-        state: { id: stateId },
-      },
-    });
-  } */}
 
 

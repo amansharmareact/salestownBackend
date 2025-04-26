@@ -1,4 +1,3 @@
-// src/leads/entities/lead-attachment.entity.ts
 
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { Lead } from './lead.entity';
