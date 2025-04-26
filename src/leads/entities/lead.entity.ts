@@ -127,6 +127,9 @@ won_check: string[];
 
 //These colums are for Lead Lost
 
+@Column({ default: false })
+is_lost: boolean;
+
 @Column({ nullable: true })
 lost_reason_id: number;  // 
 

@@ -44,7 +44,6 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  @UseGuards(JwtAuthGuard)
   async forgotPassword(@Body('email') email: string) {
     return this.authService.forgotPassword(email);
   }

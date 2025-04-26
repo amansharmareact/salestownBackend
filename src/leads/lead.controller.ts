@@ -7,9 +7,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 import { multerConfig } from './utils/multer.config';
-import { LeadLostDto } from './dto/lead-lost.dto';
-import { LeadLostSubmitDto } from './dto/lead-lost-submit.dto';
 import { MarkLeadLostDto } from './dto/mark-lead-lost.dto';
+import { MarkLeadWonDto } from './dto/mark-lead-won.dto';
 
 
 @Controller('leads')
@@ -95,16 +94,20 @@ async uploadLeadFile(
 @UseGuards(JwtAuthGuard)  // Ensure that only authenticated users can mark a lead as won
 async markLeadWon(
   @Param('lead_id') lead_id: number,
-  @Body() body: { 
-    submit_value: number; 
-    discount: number; 
-    won_value: number; 
-    won_check: string[]; 
-  },
+  @Body() markLeadWonDto :MarkLeadWonDto,
 ) {
-  return this.leadService.markLeadWon(lead_id, body);
+  return this.leadService.markLeadWon(lead_id, markLeadWonDto);
 }
 
+// View Lead if it is marked as WON
+@Get('won/view/:lead_id')
+@UseGuards(JwtAuthGuard)
+async getLeadWonView(@Param('lead_id') lead_id: number) {
+  return this.leadService.getLeadWonView(lead_id);
+}
+
+
+//Mark lead as Lost
 @UseGuards(JwtAuthGuard)
 @Post('lost/:lead_id')
 async markLeadLost(
@@ -118,6 +121,22 @@ async markLeadLost(
     message: 'Lead lost',
   };
 }
+
+//Lead Lost View
+@UseGuards(JwtAuthGuard)
+@Get('lost/view/:lead_id')
+async viewLostLead(
+  @Param('lead_id') lead_id: number,
+) {
+  const lead = await this.leadService.getLostLeadDetails(lead_id);
+
+  return {
+    success: 'true',
+    message: 'Lead lost details fetched successfully',
+    data: lead,
+  };
+}
+
 
 
 }

@@ -10,9 +10,8 @@ import { Country } from 'src/general/country/entities/country.entity';
 import { City } from 'src/general/city/entities/city.entity';
 import { State } from 'src/general/state/entities/state.entity';
 import { LeadAttachment } from './entities/lead-attachment.entity';
-import { LeadLostDto } from './dto/lead-lost.dto';
-import { LeadLostSubmitDto } from './dto/lead-lost-submit.dto';
 import { MarkLeadLostDto } from './dto/mark-lead-lost.dto';
+import { MarkLeadWonDto } from './dto/mark-lead-won.dto';
 
 
 @Injectable()
@@ -378,25 +377,32 @@ async getLeads(filters: any, user: any) {
 
 
 //Lead Won Submit
-async markLeadWon(lead_id: number, body: { 
-  submit_value: number; 
-  discount: number; 
-  won_value: number; 
-  won_check: string[]; 
-}) {
+async markLeadWon(lead_id: number, markLeadWonDto:MarkLeadWonDto ) {
+
+  const {submit_value , discount, won_value, won_check } = markLeadWonDto
+
   // Find the lead by ID
-  const lead = await this.leadRepository.findOne({ where: { lead_id: lead_id } });
+  const lead = await this.leadRepository.findOne({ where: { lead_id } });
 
   if (!lead) {
-    throw new Error('Lead not found');
+   // throw new Error('Lead not found');
+   throw new NotFoundException('Lead not found');
+  }
+ 
+  if (lead.is_won) {
+    throw new BadRequestException('This lead is Already Marked as Won');
+  }
+
+  if (lead.is_lost) {
+    throw new BadRequestException('You can not Mark this Lead as Won ,This is Already Lost');
   }
 
   //  set the respective values
   lead.is_won = true;  // Assuming this is the column to mark the lead as won
-  lead.submit_value = body.submit_value;
-  lead.discount = body.discount;
-  lead.won_value = body.won_value;
-  lead.won_check = body.won_check;  // Assuming won_check is an array field
+  lead.submit_value = submit_value;
+  lead.discount = discount;
+  lead.won_value =won_value;
+  lead.won_check =won_check;  // Assuming won_check is an array field
 
   await this.leadRepository.save(lead);
 
@@ -406,6 +412,41 @@ async markLeadWon(lead_id: number, body: {
   };
 }
 
+//Lead Won View
+async getLeadWonView(lead_id: number) {
+  const lead = await this.leadRepository.findOne({
+    where: { lead_id},
+    relations: [],
+  });
+
+  if (!lead) {
+   // throw new Error('Won lead not found');
+   throw new NotFoundException('Lead not found');
+  }
+
+  if (lead.is_lost) {
+    throw new BadRequestException('This lead is not marked as Won');
+  }
+
+  return {
+    success: 'true',
+    message: 'Lead Won View',
+    data: {
+      lead_id: lead.lead_id,
+      name: lead.name,
+      title: lead.title,
+      value: lead.value,
+      submit_value: lead.submit_value,
+      discount: lead.discount,
+      won_value: lead.won_value,
+      won_check: lead.won_check,
+      won_date: lead.updated_at, // Assuming this is when it was marked won
+    },
+  };
+}
+
+
+//Mark LEad as Lost
 async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
   const { lost_reason_id,lost_reason, comment } = markLeadLostDto;
 
@@ -415,14 +456,42 @@ async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
     throw new NotFoundException('Lead not found');
   }
 
-  // Mark the lead as lost with the provided reason and comment
+  if (lead.is_lost) {
+    throw new BadRequestException('This lead is Already Marked as Lost');
+  }
+
+  if (lead.is_won) {
+    throw new BadRequestException('You can not Mark this Lead as lost ,This Lead is already Won');
+  }
+
+  // Mark the lead as lost with reason and comment
+  lead.is_lost = true;
   lead.lost_reason_id = lost_reason_id;
   lead.lost_reason = lost_reason;
   lead.comment = comment;
 
   await this.leadRepository.save(lead);
 }
+
+//Lead Lost View
+async getLostLeadDetails(lead_id: number) {
+  const lead = await this.leadRepository.findOne({
+    where: { lead_id },
+    select: ['lead_id', 'name', 'lost_reason_id', 'lost_reason', 'comment', 'is_won'], 
+  });
+
+  if (!lead) {
+    throw new NotFoundException('Lead not found');
+  }
+
+  if (lead.is_won) {
+    throw new BadRequestException('This lead is not marked as lost');
+  }
+
+  return lead;
+}
   
+
 }
 
 
@@ -441,6 +510,146 @@ async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
 
 
 {/**
+
+//Lead Won Submit
+async markLeadWon(lead_id: number, body: { 
+  submit_value: number; 
+  discount: number; 
+  won_value: number; 
+  won_check: string[]; 
+}) {
+  // Find the lead by ID
+  const lead = await this.leadRepository.findOne({ where: { lead_id:   lead_id } });
+
+  if (!lead) {
+    throw new Error('Lead not found');
+  }
+ 
+  if (lead.is_won) {
+    throw new BadRequestException('This lead is Already Marked as Won');
+  }
+
+  if (lead.is_lost) {
+    throw new BadRequestException('This lead is Already Marked as Lost');
+  }
+
+  //  set the respective values
+  lead.is_won = true;  // Assuming this is the column to mark the lead as won
+  lead.submit_value = body.submit_value;
+  lead.discount = body.discount;
+  lead.won_value = body.won_value;
+  lead.won_check = body.won_check;  // Assuming won_check is an array field
+
+  await this.leadRepository.save(lead);
+
+  return {
+    success: 'true',
+    message: 'Lead Won',
+  };
+}
+
+//Lead Won View
+async getLeadWonView(lead_id: number) {
+  const lead = await this.leadRepository.findOne({
+    where: { lead_id},
+    relations: [],
+  });
+
+  if (!lead) {
+    throw new Error('Won lead not found');
+  }
+
+  if (lead.is_lost) {
+    throw new BadRequestException('This lead is not marked as Won');
+  }
+
+  return {
+    success: 'true',
+    message: 'Lead Won View',
+    data: {
+      lead_id: lead.lead_id,
+      name: lead.name,
+      title: lead.title,
+      value: lead.value,
+      submit_value: lead.submit_value,
+      discount: lead.discount,
+      won_value: lead.won_value,
+      won_check: lead.won_check,
+      won_date: lead.updated_at, // Assuming this is when it was marked won
+    },
+  };
+}
+
+
+//Mark LEad as Lost
+async markLeadAsLost(lead_id: number, markLeadLostDto: MarkLeadLostDto) {
+  const { lost_reason_id,lost_reason, comment } = markLeadLostDto;
+
+  const lead = await this.leadRepository.findOne({ where: { lead_id } });
+
+  if (!lead) {
+    throw new NotFoundException('Lead not found');
+  }
+
+  if (lead.is_lost) {
+    throw new BadRequestException('This lead is Already Marked as Lost');
+  }
+
+  if (lead.is_won) {
+    throw new BadRequestException('You can not Mark this Lead as lost ,This Lead is already Won');
+  }
+
+  // Mark the lead as lost with reason and comment
+  lead.is_lost = true;
+  lead.lost_reason_id = lost_reason_id;
+  lead.lost_reason = lost_reason;
+  lead.comment = comment;
+
+  await this.leadRepository.save(lead);
+}
+
+//Lead Lost View
+async getLostLeadDetails(lead_id: number) {
+  const lead = await this.leadRepository.findOne({
+    where: { lead_id },
+    select: ['lead_id', 'name', 'lost_reason_id', 'lost_reason', 'comment', 'is_won'], 
+  });
+
+  if (!lead) {
+    throw new NotFoundException('Lead not found');
+  }
+
+  if (lead.is_won) {
+    throw new BadRequestException('This lead is not marked as lost');
+  }
+
+  return lead;
+}
+  
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //Lead Lost From
   // leads.service.ts
 
