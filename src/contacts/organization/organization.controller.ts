@@ -16,6 +16,7 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { OrganizationService } from './organization.service';
 import { Req } from '@nestjs/common';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { GetOrganizationActivityDto } from './dto/get-org-activity.dto';
 
 
 @Controller('organization')
@@ -97,7 +98,38 @@ async updateOrganization(
   }
 
   //GEt organization By Search
+
+  
+  // Search for organizations
   @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async searchOrganizations(
+    @Query('per_page') perPage: number = 10,
+    @Query('page') page: number = 1,
+    @Query('search') search: string,
+  ) {
+    return this.orgService.searchOrganizations(search, perPage, page);
+  }
+
+//Org Activity
+// organization.controller.ts
+@Get('activity/:org_id')
+@UseGuards(JwtAuthGuard) // Ensure this route is protected
+async getOrganizationActivity(
+  @Param('org_id') orgId: string,
+  @Query() query: GetOrganizationActivityDto,
+  @Req() req: any,
+) {
+  return this.orgService.getOrganizationActivity(orgId, query);
+}
+
+
+
+
+}     
+
+{/**
+   @Get('search')
   @UseGuards(JwtAuthGuard)
   async searchOrganizations(
     @Query('per_page') per_page= 10,
@@ -109,20 +141,4 @@ async updateOrganization(
         page: +page,
     search,
     })
-  }
-
-  @Get('leads/:org_id')
-@UseGuards(JwtAuthGuard)
-async getLeadsByOrganization(
-  @Param('org_id') orgId: string,
-  @Query('per_page') perPage = 10,
-  @Query('page') page = 1
-) {
-  return this.organizationService.getLeadsByOrganization({
-    orgId,
-    perPage: +perPage,
-    page: +page
-  });
-}
-
-}     
+  } */}

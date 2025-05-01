@@ -201,7 +201,7 @@ async searchPersons(filters: {
 
   if (search) {
     query.andWhere(
-      '(LOWER(person.name) LIKE :search OR LOWER(person.email) LIKE :search OR person.phone LIKE :search)',
+      '(LOWER(person.person_name) LIKE :search OR LOWER(person.email) LIKE :search OR person.phone LIKE :search)',
       { search: `%${search.toLowerCase()}%` }
     );
   }
