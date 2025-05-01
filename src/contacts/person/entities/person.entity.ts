@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Organization } from 'src/contacts/organization/entities/organization.entity';
 import { Lead } from 'src/leads/entities/lead.entity';
+import { Activity } from 'src/activity/entities/activity.entity';
 
 @Entity()
 export class Person {
@@ -64,4 +65,7 @@ export class Person {
     name: null;
     emails: never[];
     phones: never[];
+
+    @OneToMany(() => Activity, (activity) => activity.person)
+  activities: Activity[];
 }

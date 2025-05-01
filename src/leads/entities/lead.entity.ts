@@ -13,7 +13,8 @@ import { Organization } from 'src/contacts/organization/entities/organization.en
 import { Person } from 'src/contacts/person/entities/person.entity';
 import { Pipeline } from 'src/pipelines/entities/pipeline.entity';
 import { PipelineStage } from 'src/pipelines/entities/pipeline-stage.entity';
-import { LeadAttachment } from './lead-attachment.entity';
+import { LeadAttachment } from './lead-attachment.entity';  
+import { Activity } from 'src/activity/entities/activity.entity';
 
 @Entity()
 export class Lead {
@@ -145,6 +146,11 @@ export class Lead {
   @Column({ nullable: true })
   comment: string;
 
+  @OneToMany(() => Activity, (activity) => activity.lead)
+  activities: Activity[];
+
+  
+
   @UpdateDateColumn()
   updated_at: Date;
   source: any;
@@ -154,6 +160,7 @@ export class Lead {
   tag_color_code: any;
   tag_color: any;
   tag_name: any;
+  tag: any;
 }
 
 

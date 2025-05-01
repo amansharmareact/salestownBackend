@@ -6,7 +6,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Lead } from 'src/leads/entities/lead.entity';
+import { Lead } from 'src/leads/entities/lead.entity';  
+import { Activity } from 'src/activity/entities/activity.entity';
 
 @Entity()
 export class User {
@@ -80,6 +81,11 @@ export class User {
 
   @OneToMany(() => Lead, (lead) => lead.created_by)
   leads: Lead[];
+
+   // Reverse relation to Activity (owner)
+   @OneToMany(() => Activity, (activity) => activity.owner)
+   activities: Activity[];
+
 
   @BeforeInsert()
   async hashPassword() {

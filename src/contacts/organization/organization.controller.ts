@@ -9,6 +9,7 @@ import {
   Get,
   Query,
   Search,
+  Param,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -19,6 +20,7 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 
 @Controller('organization')
 export class OrganizationController {
+  organizationService: any;
   constructor(private readonly orgService: OrganizationService) {}
 
   @Post('add')
@@ -27,7 +29,7 @@ export class OrganizationController {
     return this.orgService.createOrganization(dto, req.user);
   }
 
-  @Patch('update')
+  @Patch('update/:org_id')
   @UseGuards(JwtAuthGuard)
   async updateOrg(
     //@Param('org_id') paramId: string,
@@ -105,4 +107,19 @@ export class OrganizationController {
     search,
     })
   }
+
+  @Get('leads/:org_id')
+@UseGuards(JwtAuthGuard)
+async getLeadsByOrganization(
+  @Param('org_id') orgId: string,
+  @Query('per_page') perPage = 10,
+  @Query('page') page = 1
+) {
+  return this.organizationService.getLeadsByOrganization({
+    orgId,
+    perPage: +perPage,
+    page: +page
+  });
 }
+
+}     

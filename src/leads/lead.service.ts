@@ -177,7 +177,7 @@ async viewLead(lead_id: number, user: any) {
   
   //API ->Get Leads
 
-async getLeads(filters: any, user: any) {
+async getLeads(filters: any, user: any,) {
     const {
       per_page = 10,
       page = 1,

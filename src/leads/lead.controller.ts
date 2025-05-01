@@ -9,6 +9,7 @@ import { diskStorage } from 'multer';
 import { multerConfig } from './utils/multer.config';
 import { MarkLeadLostDto } from './dto/mark-lead-lost.dto';
 import { MarkLeadWonDto } from './dto/mark-lead-won.dto';
+import { GetLeadsDto } from './dto/get-leads.dto';
 
 
 @Controller('leads')
@@ -60,6 +61,7 @@ async deleteLead(@Param('lead_id') lead_id: number) {
 @Get()
 @UseGuards(JwtAuthGuard)
 async getLeads(
+ // @Body() filters: GetLeadsDto,
   @Query() query: any, // can use a DTO aslo here
   @Req() req: any,
 ) {

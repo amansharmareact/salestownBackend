@@ -19,6 +19,11 @@ import { PipelineStage } from './pipelines/entities/pipeline-stage.entity';
 import { Lead } from './leads/entities/lead.entity';
 import { LeadModule } from './leads/lead.module';
 import { LeadAttachment } from './leads/entities/lead-attachment.entity';
+import { ActivityModule } from './activity/activity.module';
+import { ActivityPurpose } from './activity/entities/activity-purpose.entity';
+import { ActivityType } from './activity/entities/activity-type.entity';
+import { Activity } from './activity/entities/activity.entity';
+import { CustomColumn } from './activity/entities/custom-column.entity';
 
 
 @Module({
@@ -31,10 +36,11 @@ import { LeadAttachment } from './leads/entities/lead-attachment.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [User,Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead,LeadAttachment],
+      entities: [User,Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead,LeadAttachment,
+        ActivityPurpose,ActivityType,Activity,CustomColumn  ],
       synchronize: true,
       ssl:{
-        rejectUnauthorized:false,
+        rejectUnauthorized:false
       },
     }),  
     AuthModule,
@@ -44,6 +50,7 @@ import { LeadAttachment } from './leads/entities/lead-attachment.entity';
     StateModule,
     CityModule,
     LeadModule,
+    ActivityModule,
   ],
 
 

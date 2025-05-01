@@ -1,4 +1,6 @@
 
+
+import { Activity } from 'src/activity/entities/activity.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { Person } from 'src/contacts/person/entities/person.entity';
 import { Lead } from 'src/leads/entities/lead.entity';
@@ -76,6 +78,10 @@ export class Organization {
 
   @OneToMany(() => Lead, (lead) => lead.organization)
   leads: Lead[];
+
+ 
+  @OneToMany(() => Activity, (activity) => activity.organization)
+  activities: Activity[];
 
   @CreateDateColumn()
   created_at: Date;
