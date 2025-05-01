@@ -31,27 +31,24 @@ export class OrganizationService {
     };
   }
 
-  async updateOrganization(
-    org_id: string,
-    dto: UpdateOrganizationDto,
-  ): Promise<any> {
-    const updateOrg = await this.organizationRepo.findOne({
-      where: { id: org_id },
-    });
+  // organization.service.ts
+async updateOrganization(orgId: string, dto: UpdateOrganizationDto) {
+  const organization = await this.organizationRepo.findOne({ where: { id: orgId } });
 
-    if (!updateOrg) {
-      throw new NotFoundException('Organization not found');
-    }
-
-    // Merge and save
-    Object.assign(updateOrg, dto);
-    await this.organizationRepo.save(updateOrg);
-
-    return {
-      success: 'true',
-      message: 'Organization Updated',
-    };
+  if (!organization) {
+    throw new NotFoundException('Organization not found');
   }
+
+  Object.assign(organization, dto);
+
+  await this.organizationRepo.save(organization);
+
+  return {
+    success: 'true',
+    message: 'Organization Updated',
+  };
+}
+
 
   async deleteOrganization(org_id: string, user: any) {
     const deleteOrg = await this.organizationRepo.findOne({

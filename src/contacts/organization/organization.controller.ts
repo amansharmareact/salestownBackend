@@ -29,17 +29,20 @@ export class OrganizationController {
     return this.orgService.createOrganization(dto, req.user);
   }
 
-  @Patch('update/:org_id')
-  @UseGuards(JwtAuthGuard)
-  async updateOrg(
-    //@Param('org_id') paramId: string,
-    @Body() body: UpdateOrganizationDto & { org_id?: string },
-    @Query('org_id') queryId: string,
-    @Req() req: any,
-  ) {
-    const orgId = body.org_id || queryId; //paramId
-    return this.orgService.updateOrganization(orgId, body);
-  }
+  // organization.controller.ts
+@UseGuards(JwtAuthGuard) // Assuming you have JWT auth guard
+@Post('update/:org_id')
+async updateOrganization(
+  @Param('org_id') orgId: string,
+  @Body() dto: UpdateOrganizationDto,
+  @Req() req: any,
+) {
+  const userId = req.user.user_id; // Use logged-in user ID
+  dto.owner = userId; // Override the owner in DTO
+  const result = await this.orgService.updateOrganization(orgId, dto);
+  return result;
+}
+
 
   // DELETE /organization/delete/:org_id
   @Delete('delete')
