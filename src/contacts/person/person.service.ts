@@ -193,52 +193,48 @@ async listAllPersons(filters: {
 }
 
 //Serach Person 
-async searchPersons(filters: {
-  per_page: number,
+async searchPersons(
   page: number,
+  perPage: number,
   search?: string,
-  organization_id?: number
-}) {
-  const { per_page, page, search, organization_id } = filters;
-  const skip = (page - 1) * per_page;
-
+  organizationId?: string
+) {
   const query = this.personRepo
     .createQueryBuilder('person')
-    .leftJoinAndSelect('person.organization', 'organization')
-    .orderBy('person.id', 'DESC');
+    .leftJoinAndSelect('person.organization', 'organization');
 
   if (search) {
-    query.andWhere(
-      '(LOWER(person.person_name) LIKE :search OR LOWER(person.email) LIKE :search OR person.phone LIKE :search)',
-      { search: `%${search.toLowerCase()}%` }
-    );
+    query.andWhere('organization.name ILIKE :search', { search: `%${search}%` });
   }
 
-  if (organization_id) {
-    query.andWhere('person.organization_id = :orgId', { orgId: organization_id });
+  if (organizationId) {
+    query.andWhere('person.organization_id = :orgId', { orgId: organizationId });
   }
 
-  const [persons, total] = await query.skip(skip).take(per_page).getManyAndCount();
+  query.skip((page - 1) * perPage).take(perPage).orderBy('person.created_at', 'DESC');
 
-  const data = persons.map(p => ({
+  const [persons, total] = await query.getManyAndCount();
+
+  const data = persons.map((p) => ({
     person_id: p.id,
-    name: p.person_name || '',
-    email: p.email || '',
-    phone: p.phone || '',
+    name: p.person_name,
+    email: p.email?.[0] || '',
+    phone: p.phone?.[0] || '',
   }));
 
   return {
     success: 'true',
     message: 'Person List Fetched',
     info: {
-      per_page,
+      per_page: perPage,
       page,
       total,
-      is_next: page * per_page < total,
+      is_next: page * perPage < total,
     },
     data,
   };
 }
+
 
 //Person's Lead
 async getPersonLeads(personId: string, page: number, perPage: number,user: User) {
@@ -327,3 +323,53 @@ async getPersonActivity(personId: string, query: GetPersonActivityDto) {
 
 
 }
+
+
+{/**
+  async searchPersons(filters: {
+  per_page: number,
+  page: number,
+  search?: string,
+  organization_id?: number
+}) {
+  const { per_page, page, search, organization_id } = filters;
+  const skip = (page - 1) * per_page;
+
+  const query = this.personRepo
+    .createQueryBuilder('person')
+    .leftJoinAndSelect('person.organization', 'organization')
+    .orderBy('person.id', 'DESC');
+
+  if (search) {
+    query.andWhere(
+      '(LOWER(person.person_name) LIKE :search OR LOWER(person.email) LIKE :search OR person.phone LIKE :search)',
+      { search: `%${search.toLowerCase()}%` }
+    );
+  }
+
+  if (organization_id) {
+    query.andWhere('person.organization_id = :orgId', { orgId: organization_id });
+  }
+
+  const [persons, total] = await query.skip(skip).take(per_page).getManyAndCount();
+
+  const data = persons.map(p => ({
+    person_id: p.id,
+    name: p.person_name || '',
+    email: p.email || '',
+    phone: p.phone || '',
+  }));
+
+  return {
+    success: 'true',
+    message: 'Person List Fetched',
+    info: {
+      per_page,
+      page,
+      total,
+      is_next: page * per_page < total,
+    },
+    data,
+  };
+}
+ */}

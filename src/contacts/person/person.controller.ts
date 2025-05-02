@@ -75,22 +75,19 @@ async listPersons(
 }
 
 // Search Person 
-
 @Get('search')
 @UseGuards(JwtAuthGuard)
 async searchPersons(
-  @Query() query: any,
-  @Body() body: any
+  @Query('per_page') perPage = 10,
+  @Query('page') page = 1,
+  @Query('search') search?: string,
+  @Query('organization_id') orgId?: string,
 ) {
-  const filters = {
-    per_page: Number(query.per_page || body.per_page || 10),
-    page: Number(query.page || body.page || 1),
-    search: query.search || body.search || '',
-    organization_id: query.organization_id || body.organization_id || null,
-  };
-
-  return this.personService.searchPersons(filters);
+  return this.personService.searchPersons(+page, +perPage, search, orgId);
 }
+
+
+
 
 @Get('leads/:person_id')
 @UseGuards(JwtAuthGuard) // if using JWT
@@ -115,3 +112,21 @@ async getOrganizationActivity(
 }
 
 }
+
+
+{/**
+  @Get('search')
+@UseGuards(JwtAuthGuard)
+async searchPersons(
+  @Query() query: any,
+  @Body() body: any
+) {
+  const filters = {
+    per_page: Number(query.per_page || body.per_page || 10),
+    page: Number(query.page || body.page || 1),
+    search: query.search || body.search || '',
+    organization_id: query.organization_id || body.organization_id || null,
+  };
+
+  return this.personService.searchPersons(filters);
+} */}
