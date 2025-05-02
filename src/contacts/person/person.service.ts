@@ -199,7 +199,7 @@ async searchPersons(page: number, perPage: number, search?: string) {
   if (search) {
     queryBuilder
       .leftJoin('person.organization', 'organization')
-      .where('organization.name ILIKE :search', { search: `%${search}%` });
+      .where('organization.organization_name ILIKE :search', { search: `%${search}%` });
   }
 
   const total = await queryBuilder.getCount();
