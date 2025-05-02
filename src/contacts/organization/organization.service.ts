@@ -26,7 +26,8 @@ export class OrganizationService {
     console.log('HIT');
     const org = this.organizationRepo.create({
       ...dto,
-      id: user.user_id,
+      owner: user.user_id,
+    //  id: user.user_id,
     });
 
     const saved = await this.organizationRepo.save(org);

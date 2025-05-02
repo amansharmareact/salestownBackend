@@ -40,8 +40,8 @@ import { CustomColumn } from './activity/entities/custom-column.entity';
         ActivityPurpose,ActivityType,Activity,CustomColumn  ],
       synchronize: true,
       ssl:{
-        rejectUnauthorized:false
-      },
+        rejectUnauthorized:false,
+      }
     }),  
     AuthModule,
     OrganizationModule,
