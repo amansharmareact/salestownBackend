@@ -81,10 +81,10 @@ async searchPersons(
   @Query('per_page') perPage = 10,
   @Query('page') page = 1,
   @Query('search') search?: string,
-  @Query('organization_id') orgId?: string,
 ) {
-  return this.personService.searchPersons(+page, +perPage, search, orgId);
+  return this.personService.searchPersons(+page, +perPage, search);
 }
+
 
 
 

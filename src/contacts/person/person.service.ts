@@ -193,33 +193,27 @@ async listAllPersons(filters: {
 }
 
 //Serach Person 
-async searchPersons(
-  page: number,
-  perPage: number,
-  search?: string,
-  organizationId?: string
-) {
-  const query = this.personRepo
-    .createQueryBuilder('person')
-    .leftJoinAndSelect('person.organization', 'organization');
+async searchPersons(page: number, perPage: number, search?: string) {
+  const queryBuilder = this.personRepo.createQueryBuilder('person');
 
   if (search) {
-    query.andWhere('organization.organization_name ILIKE :search', { search: `%${search}%` });
+    queryBuilder
+      .leftJoin('person.organization', 'organization')
+      .where('organization.name ILIKE :search', { search: `%${search}%` });
   }
 
-  if (organizationId) {
-    query.andWhere('person.organization_id = :orgId', { orgId: organizationId });
-  }
+  const total = await queryBuilder.getCount();
 
-  query.skip((page - 1) * perPage).take(perPage).orderBy('person.created_at', 'DESC');
+  const persons = await queryBuilder
+    .skip((page - 1) * perPage)
+    .take(perPage)
+    .getMany();
 
-  const [persons, total] = await query.getManyAndCount();
-
-  const data = persons.map((p) => ({
-    person_id: p.id,
-    name: p.person_name,
-    email: p.email?.[0] || '',
-    phone: p.phone?.[0] || '',
+  const data = persons.map((person) => ({
+    person_id: person.id,
+    name: person.person_name,
+    email: person.email?.[0] || null,
+    phone: person.phone?.[0] || null,
   }));
 
   return {
