@@ -204,7 +204,7 @@ async searchPersons(
     .leftJoinAndSelect('person.organization', 'organization');
 
   if (search) {
-    query.andWhere('organization.name ILIKE :search', { search: `%${search}%` });
+    query.andWhere('organization.organization_name ILIKE :search', { search: `%${search}%` });
   }
 
   if (organizationId) {
