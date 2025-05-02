@@ -4,6 +4,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { GetPersonActivityDto } from './dto/get-org-leads.dto';
 
 @Controller('person')
 export class PersonController {
@@ -89,6 +90,28 @@ async searchPersons(
   };
 
   return this.personService.searchPersons(filters);
+}
+
+@Get('leads/:person_id')
+@UseGuards(JwtAuthGuard) // if using JWT
+async getPersonLeads(
+  @Param('person_id') personId: string,
+  @Query('per_page') perPage = 10,
+  @Query('page') page = 1,
+  @Req() req: any,
+) {
+  const user = req.user;
+  return this.personService.getPersonLeads(personId, +page, +perPage,user);
+}
+
+@Get('activity/:person_id')
+@UseGuards(JwtAuthGuard) // Ensure this route is protected
+async getOrganizationActivity(
+  @Param('person_id') personId: string,
+  @Query() query: GetPersonActivityDto,
+  @Req() req: any,
+) {
+  return this.personService.getPersonActivity(personId, query);
 }
 
 }

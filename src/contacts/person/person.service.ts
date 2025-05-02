@@ -6,6 +6,10 @@ import { Repository } from 'typeorm';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { Organization } from '../organization/entities/organization.entity';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { Lead } from 'src/leads/entities/lead.entity';
+import { User } from 'src/auth/entities/user.entity';
+import { GetPersonActivityDto } from './dto/get-org-leads.dto';
+import { Activity } from 'src/activity/entities/activity.entity';
 
 @Injectable()
 export class PersonService {
@@ -14,6 +18,10 @@ export class PersonService {
     private readonly personRepo: Repository<Person>,
     @InjectRepository(Organization)
     private readonly orgRepo: Repository<Organization>,
+    @InjectRepository(Lead)
+    private readonly leadRepository: Repository<Lead>,
+     @InjectRepository(Activity)
+      private readonly activityRepository: Repository<Activity>,
   ) {}
 
   // ADD PERSON
@@ -227,6 +235,91 @@ async searchPersons(filters: {
       page,
       total,
       is_next: page * per_page < total,
+    },
+    data,
+  };
+}
+
+//Person's Lead
+async getPersonLeads(personId: string, page: number, perPage: number,user: User) {
+  const [leads, total] = await this.leadRepository.findAndCount({
+    where: { person: { id: personId } },
+    relations: ['person', 'pipeline', 'pipelineStage', 'organization', 'created_by'],
+    skip: (page - 1) * perPage,
+    take: perPage,
+    order: { created_at: 'DESC' },
+  });
+
+  const data = leads.map((lead) => ({
+    lead_id: lead.lead_id,
+    title: lead.title,
+    pipeline_id: lead.pipeline_id,
+    pipestage: lead.pipestage_id,                                      
+    pipestage_total: 5, // we can query actual stage count if needed
+    value: lead.value,
+    organization_name: lead.organization?.name || '',
+    person_name: lead.person?.name || '',
+    tag_name: lead.tag_name || null,
+    tag_color: lead.tag_color || null,
+    tag_color_code: lead.tag_color_code || null,
+    salesperson: lead.created_by?.name || '', 
+    lead_activity_flag: lead.lead_activity_flag || '',
+  }))
+  return {
+    success: 'true',
+    message: "Person's Leads Found",
+    info: {
+      per_page: perPage,
+      page,
+      total_leads: total,
+      is_next: page * perPage < total,
+    },
+    data,
+  };
+}
+
+//Person's Activity
+async getPersonActivity(personId: string, query: GetPersonActivityDto) {
+  const perPage = Number(query.per_page) || 10;
+  const page = Number(query.page) || 1;
+
+  const [activities, total] = await this.activityRepository.findAndCount({
+    where: { person: { id: personId } },
+    relations: ['purpose'],
+    order: { date: 'DESC', from_time: 'DESC' },
+    skip: (page - 1) * perPage,
+    take: perPage,
+  });
+
+  const data = activities.map((activity) => ({
+    activity_id: activity.acitivity_id,
+    purpose_id: activity.purpose?.id,
+    purpose: activity.purpose?.purpose || '',
+    icon: activity.purpose?.icon || '',
+    activity_title: activity.activity_title || '',
+    activity_note: activity.activity_note || '',
+    activity_date: activity.date,
+    activity_time: activity.from_time,
+    activity_end_time: activity.to_time,
+    activity_status: activity.mark_done,
+    report: activity.report || null,
+    is_assign: 0, // Assuming static
+    activity_timestamp: Math.floor(new Date(`${activity.date}T${activity.from_time}`).getTime() / 1000).toString(),
+    created_at: activity.created_at.toISOString().replace('T', ' ').split('.')[0],
+    created_time: Math.floor(activity.created_at.getTime() / 1000),
+    completed_at: activity.completed_at
+      ? activity.completed_at.toISOString().replace('T', ' ').split('.')[0]
+      : null,
+  }));
+
+  return {
+    success: 'true',
+    message: "Oragnization's Activity Found",
+    info: {
+      per_page: perPage,
+      page: page,
+      total_activity: total,
+      is_next: total > page * perPage,
     },
     data,
   };

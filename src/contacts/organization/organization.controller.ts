@@ -123,6 +123,21 @@ async getOrganizationActivity(
   return this.orgService.getOrganizationActivity(orgId, query);
 }
 
+//Organiation Leads
+@Get('leads/:org_id')
+@UseGuards(JwtAuthGuard) // or your JWT Auth Guard
+async getOrganizationLeads(
+  @Param('org_id') orgId: string,
+  @Query('page') page = 1,
+  @Query('per_page') perPage = 10,
+  @Req() req: any,
+) {
+  const user = req.user;
+  return await this.orgService.getOrganizationLeads(orgId, +page, +perPage, user);
+}
+
+ // @Body() body: LeadListDto,
+
 
 
 

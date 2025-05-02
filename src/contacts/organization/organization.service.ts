@@ -8,6 +8,7 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { User } from 'src/auth/entities/user.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
 import { GetOrganizationActivityDto } from './dto/get-org-activity.dto';
+import { Lead } from 'src/leads/entities/lead.entity';
 
 @Injectable()
 export class OrganizationService {
@@ -17,6 +18,8 @@ export class OrganizationService {
     private readonly organizationRepo: Repository<Organization>,
     @InjectRepository(Activity)
   private readonly activityRepository: Repository<Activity>,
+  @InjectRepository(Lead)
+  private readonly leadRepository: Repository<Lead>,
   ) {}
 
   async createOrganization(dto: CreateOrganizationDto, user: any) {
@@ -301,6 +304,46 @@ async getOrganizationActivity(orgId: string, query: GetOrganizationActivityDto) 
     data,
   };
 }
+
+async getOrganizationLeads(orgId: string, page: number, perPage: number, user: User) {
+  const [leads, total] = await this.leadRepository.findAndCount({
+    where: { organization_id: orgId },
+    relations: ['person', 'pipeline', 'pipelineStage', 'organization', 'created_by'],
+    skip: (page - 1) * perPage,
+    take: perPage,
+    order: { created_at: 'DESC' },
+  });
+
+  const data = leads.map((lead) => ({
+    lead_id: lead.lead_id,
+    title: lead.title,
+    pipeline_id: lead.pipeline_id,
+    pipestage: lead.pipestage_id,
+    pipestage_total: 5, // we can query actual stage count if needed
+    value: lead.value,
+    organization_name: lead.organization?.name || '',
+    person_name: lead.person?.name || '',
+    tag_name: lead.tag_name || null,
+    tag_color: lead.tag_color || null,
+    tag_color_code: lead.tag_color_code || null,
+    salesperson: lead.created_by?.name || '', 
+    lead_activity_flag: lead.lead_activity_flag || '',
+  }));
+
+  return {
+    success: 'true',
+    message: "Oragnization's Leads Found",
+    info: {
+      per_page: perPage,
+      page,
+      total_leads: total,
+      is_next: page * perPage < total,
+    },
+    data,
+  };
+}
+
+
 
   
 }

@@ -13,9 +13,12 @@ const seed = async () => {
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [ActivityPurpose,ActivityType], // entities here
-      synchronize: true, 
-      // Keep false to avoid auto-syncing during script execution
+     // entities: [ActivityPurpose,ActivityType], // entities here
+     entities: ['src/**/*.entity{.ts,.js}'], 
+      synchronize: true,  // Keep false to avoid auto-syncing during script execution
+      ssl:{
+        rejectUnauthorized:false,
+      }
   });
 
   await dataSource.initialize();

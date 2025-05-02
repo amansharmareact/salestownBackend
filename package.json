@@ -22,7 +22,7 @@
     "seed:states": "ts-node --files src/general/seeds/state.seed.ts",
     "seed:cities": "ts-node --files src/general/seeds/city.seed.ts",
     "seed:pipelines": "ts-node --files -r tsconfig-paths/register src/pipelines/seeds/pipeline.seed.ts",
-    "seed:activity-filter": "ts-node --files src/activity/seeds/activity-filter.seed.ts"
+    "seed:activity-filter": "ts-node --files -r tsconfig-paths/register src/activity/seeds/activity-filter.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
