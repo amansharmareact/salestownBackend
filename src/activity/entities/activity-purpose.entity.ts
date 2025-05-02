@@ -13,7 +13,6 @@ export class ActivityPurpose {
   @Column({ nullable: true })
   icon: string;
 
-  
   @OneToMany(() => Activity, (activity) => activity.purpose)
   activities: Activity[];
 }
