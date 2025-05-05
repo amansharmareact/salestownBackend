@@ -32,8 +32,6 @@ export class ActivityController {
     return this.activityService.listActivities(req.user, filterDto);
   }
 
-  
-
   @UseGuards(JwtAuthGuard)
   @Get('notification')
   async getActivityNotifications(@Req() req: any) {
@@ -48,11 +46,6 @@ export class ActivityController {
   }
 
   }
-
-
-
-
-
 
 {/**
 

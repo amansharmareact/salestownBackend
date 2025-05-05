@@ -24,6 +24,9 @@ import { ActivityPurpose } from './activity/entities/activity-purpose.entity';
 import { ActivityType } from './activity/entities/activity-type.entity';
 import { Activity } from './activity/entities/activity.entity';
 import { CustomColumn } from './activity/entities/custom-column.entity';
+import { Category } from './product/entities/category.entity';
+import { ProductModule } from './product/product.module';
+import { Product } from './product/entities/product.entity';
 
 
 @Module({
@@ -37,7 +40,7 @@ import { CustomColumn } from './activity/entities/custom-column.entity';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       entities: [User,Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead,LeadAttachment,
-        ActivityPurpose,ActivityType,Activity,CustomColumn  ],
+        ActivityPurpose,ActivityType,Activity,CustomColumn,Category,Product],
       synchronize: true,
       ssl:{
         rejectUnauthorized:false,
@@ -51,6 +54,7 @@ import { CustomColumn } from './activity/entities/custom-column.entity';
     CityModule,
     LeadModule,
     ActivityModule,
+    ProductModule,
   ],
 
 

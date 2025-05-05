@@ -114,7 +114,6 @@ export class ActivityService {
         },
         type: {
           typr: activity.type.type
-
         },
         lead: {
           name: activity.lead.name
@@ -135,7 +134,7 @@ export class ActivityService {
 async listActivities(user: User, filterDto: ActivityFilterDto) {
   const {
     per_page = 10,
-    page = 1,
+    page = 1,  
     search,
     user_id,
     start_date,
@@ -192,15 +191,14 @@ async listActivities(user: User, filterDto: ActivityFilterDto) {
     lead_title: act.lead?.title || '',
     organization_name: act.organization?.name || null,
     report: act.report,
-    updated_at: null, // if you track updates
+    updated_at: null, 
     status: act.mark_done,
     is_assign: 0,
     created_at: act['created_at']?.toISOString().replace('T', ' ').substring(0, 19) || '',
     created_time: Math.floor(new Date(act['created_at']).getTime() / 1000),
-    completed_at: '', // set if you store it
+    completed_at: '', 
     added_by: act.owner?.user_id || null,
-    owner: act.owner?.name || '',
-    
+    owner: act.owner?.name || '',   
   }));
 
   return {
@@ -221,7 +219,7 @@ async getActivityNotifications(user: any) {
   const activities = await this.activityRepo.find({
     where: { owner: { user_id: user.user_id } },
     relations: ['purpose', 'owner'],
-    order: { created_at: 'DESC' },
+    order: { created_at: 'DESC' },  
   });
 
   return activities.map(activity => ({
@@ -232,7 +230,7 @@ async getActivityNotifications(user: any) {
     activity_timestamp: Math.floor(
       new Date(`${activity.date}T${activity.from_time}:00`).getTime() / 1000,
     ).toString(),
-    is_assign: 0, // or derive from logic if needed
+    is_assign: 0,
     created_at: activity.created_at.toISOString().replace('T', ' ').split('.')[0],
     purpose: activity.purpose?.purpose || 'N/A',
     icon: this.getIconFromPurpose(activity.purpose?.icon),
@@ -253,10 +251,6 @@ private getIconFromPurpose(purpose: string): string {
 }
 
 {/***
-
-
-
-
 
 async listActivities(user: User, filterDto: ActivityFilterDto) {
     const {
