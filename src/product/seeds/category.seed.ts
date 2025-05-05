@@ -14,6 +14,9 @@ const AppDataSource = new DataSource({
    // entities: [ActivityPurpose,ActivityType], // entities here
    entities: ['src/**/*.entity{.ts,.js}'], 
     synchronize: true,
+    ssl:{
+      rejectUnauthorized:false,
+    }
 });
 
 const seedCategories = async () => {
