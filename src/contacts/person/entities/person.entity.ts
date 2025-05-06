@@ -12,6 +12,7 @@ import {
 import { Organization } from 'src/contacts/organization/entities/organization.entity';
 import { Lead } from 'src/leads/entities/lead.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
+import { Note } from 'src/general/notes/entities/notes.entity';
 
 @Entity()
 export class Person {
@@ -68,4 +69,8 @@ export class Person {
 
     @OneToMany(() => Activity, (activity) => activity.person)
   activities: Activity[];
+
+  @OneToMany(() => Note, (note) => note.person)
+notes: Note[];
+
 }

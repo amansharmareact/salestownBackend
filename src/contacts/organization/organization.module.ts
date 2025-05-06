@@ -12,10 +12,11 @@ import { Lead } from 'src/leads/entities/lead.entity';
 import { PipelineStage } from 'src/pipelines/entities/pipeline-stage.entity';
 import { Pipeline } from 'src/pipelines/entities/pipeline.entity';
 import { Person } from '../person/entities/person.entity';
+import { Note } from 'src/general/notes/entities/notes.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Organization, User,Activity, Lead,
+  imports: [TypeOrmModule.forFeature([Organization, User,Activity, Lead,Note,
     Pipeline,
     PipelineStage,
     Person,]),

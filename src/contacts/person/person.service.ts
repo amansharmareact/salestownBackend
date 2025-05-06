@@ -10,6 +10,7 @@ import { Lead } from 'src/leads/entities/lead.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { GetPersonActivityDto } from './dto/get-org-leads.dto';
 import { Activity } from 'src/activity/entities/activity.entity';
+import { Note } from 'src/general/notes/entities/notes.entity';
 
 @Injectable()
 export class PersonService {
@@ -22,6 +23,8 @@ export class PersonService {
     private readonly leadRepository: Repository<Lead>,
      @InjectRepository(Activity)
       private readonly activityRepository: Repository<Activity>,
+      @InjectRepository(Note)
+            private readonly noteRepo: Repository<Note>,
   ) {}
 
   // ADD PERSON
@@ -315,55 +318,45 @@ async getPersonActivity(personId: string, query: GetPersonActivityDto) {
   };
 }
 
+//Person Notes
+async getPersonNotes(person_id: string, perPage = 10, page = 1) {
+  const person = await this.personRepo.findOne({ where: { id: person_id } });
 
-}
-
-
-{/**
-  async searchPersons(filters: {
-  per_page: number,
-  page: number,
-  search?: string,
-  organization_id?: number
-}) {
-  const { per_page, page, search, organization_id } = filters;
-  const skip = (page - 1) * per_page;
-
-  const query = this.personRepo
-    .createQueryBuilder('person')
-    .leftJoinAndSelect('person.organization', 'organization')
-    .orderBy('person.id', 'DESC');
-
-  if (search) {
-    query.andWhere(
-      '(LOWER(person.person_name) LIKE :search OR LOWER(person.email) LIKE :search OR person.phone LIKE :search)',
-      { search: `%${search.toLowerCase()}%` }
-    );
+  if (!person) {
+    throw new NotFoundException({
+      success: "false",
+      message: "Person not found",
+    });
   }
 
-  if (organization_id) {
-    query.andWhere('person.organization_id = :orgId', { orgId: organization_id });
-  }
+  // Fetch Notes with Pagination
+  const [notes, total] = await this.noteRepo.findAndCount({
+    where: { person_id: person_id },
+    order: { created_at: 'DESC' },
+    skip: (page - 1) * perPage,
+    take: perPage,
+  });
 
-  const [persons, total] = await query.skip(skip).take(per_page).getManyAndCount();
-
-  const data = persons.map(p => ({
-    person_id: p.id,
-    name: p.person_name || '',
-    email: p.email || '',
-    phone: p.phone || '',
+  
+  const formattedNotes = notes.map((note) => ({
+    id: note.id,
+    note: note.notes,
+    created_at: note.created_at,
   }));
 
   return {
-    success: 'true',
-    message: 'Person List Fetched',
+    success: "true",
+    message: "Person's Notes Found",
     info: {
-      per_page,
+      per_page: perPage,
       page,
-      total,
-      is_next: page * per_page < total,
+      total_notes: total,
+      is_next: page * perPage < total,
     },
-    data,
+    data: formattedNotes,
   };
 }
- */}
+
+}
+
+

@@ -27,6 +27,8 @@ import { CustomColumn } from './activity/entities/custom-column.entity';
 import { Category } from './product/entities/category.entity';
 import { ProductModule } from './product/product.module';
 import { Product } from './product/entities/product.entity';
+import { NotesModule } from './general/notes/notes.module';
+import { Note } from './general/notes/entities/notes.entity';
 
 
 @Module({
@@ -40,10 +42,10 @@ import { Product } from './product/entities/product.entity';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       entities: [User,Organization,Person,Country,State,City,Pipeline,PipelineStage,Lead,LeadAttachment,
-        ActivityPurpose,ActivityType,Activity,CustomColumn,Category,Product],
+        ActivityPurpose,ActivityType,Activity,CustomColumn,Category,Product,Note],
       synchronize: true,
       ssl:{
-        rejectUnauthorized:false,
+        rejectUnauthorized:false, 
       }
     }),  
     AuthModule,
@@ -55,6 +57,7 @@ import { Product } from './product/entities/product.entity';
     LeadModule,
     ActivityModule,
     ProductModule,
+    NotesModule,
   ],
 
 

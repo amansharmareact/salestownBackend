@@ -15,6 +15,7 @@ import { Pipeline } from 'src/pipelines/entities/pipeline.entity';
 import { PipelineStage } from 'src/pipelines/entities/pipeline-stage.entity';
 import { LeadAttachment } from './lead-attachment.entity';  
 import { Activity } from 'src/activity/entities/activity.entity';
+import { Note } from 'src/general/notes/entities/notes.entity';
 
 @Entity()
 export class Lead {
@@ -148,6 +149,10 @@ export class Lead {
 
   @OneToMany(() => Activity, (activity) => activity.lead)
   activities: Activity[];
+
+  @OneToMany(() => Note, (note) => note.lead)
+notes: Note[];
+
 
   
 

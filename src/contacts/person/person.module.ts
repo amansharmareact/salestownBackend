@@ -11,9 +11,10 @@ import { Lead } from 'src/leads/entities/lead.entity';
 import { Pipeline } from 'src/pipelines/entities/pipeline.entity';
 import { PipelineStage } from 'src/pipelines/entities/pipeline-stage.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
+import { Note } from 'src/general/notes/entities/notes.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Person, Organization, User,Lead,Pipeline,PipelineStage,Activity]),
+  imports: [TypeOrmModule.forFeature([Person, Organization, User,Lead,Pipeline,PipelineStage,Activity,Note]),
   JwtModule.register({}), 
 ],
   controllers: [PersonController],

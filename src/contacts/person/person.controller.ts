@@ -111,22 +111,14 @@ async getOrganizationActivity(
   return this.personService.getPersonActivity(personId, query);
 }
 
-}
-
-
-{/**
-  @Get('search')
+//Person Notes
+@Get('notes/:person_id')
 @UseGuards(JwtAuthGuard)
-async searchPersons(
-  @Query() query: any,
-  @Body() body: any
+async getOrganizationNotes(
+  @Param('person_id') person_id: string,
+  @Query('per_page') perPage: number = 10,
+  @Query('page') page: number = 1,
 ) {
-  const filters = {
-    per_page: Number(query.per_page || body.per_page || 10),
-    page: Number(query.page || body.page || 1),
-    search: query.search || body.search || '',
-    organization_id: query.organization_id || body.organization_id || null,
-  };
-
-  return this.personService.searchPersons(filters);
-} */}
+  return this.personService.getPersonNotes(person_id, perPage, page);
+}
+}

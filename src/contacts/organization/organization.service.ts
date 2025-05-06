@@ -9,6 +9,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
 import { GetOrganizationActivityDto } from './dto/get-org-activity.dto';
 import { Lead } from 'src/leads/entities/lead.entity';
+import { Note } from 'src/general/notes/entities/notes.entity';
 
 @Injectable()
 export class OrganizationService {
@@ -20,6 +21,8 @@ export class OrganizationService {
   private readonly activityRepository: Repository<Activity>,
   @InjectRepository(Lead)
   private readonly leadRepository: Repository<Lead>,
+   @InjectRepository(Note)
+      private readonly noteRepo: Repository<Note>,
   ) {}
 
   async createOrganization(dto: CreateOrganizationDto, user: any) {
@@ -344,44 +347,44 @@ async getOrganizationLeads(orgId: string, page: number, perPage: number, user: U
   };
 }
 
+//Organization Notes
+async getOrganizationNotes(orgId: string, perPage = 10, page = 1) {
+  // Check if organization exists
+  const organization = await this.organizationRepo.findOne({ where: { id: orgId } });
 
+  if (!organization) {
+    throw new NotFoundException({
+      success: "false",
+      message: "Organization not found",
+    });
+  }
 
+  // Fetch notes with pagination
+  const [notes, total] = await this.noteRepo.findAndCount({
+    where: { organization_id: orgId },
+    order: { created_at: 'DESC' },
+    skip: (page - 1) * perPage,
+    take: perPage,
+  });
+
+  const formattedNotes = notes.map((note) => ({
+    id: note.id,
+    note: note.notes,
+    created_at: note.created_at,
+  }));
+
+  return {
+    success: "true",
+    message: "Oragnization's Notes Found",
+    info: {
+      per_page: perPage,
+      page,
+      total_notes: total,
+      is_next: page * perPage < total,
+    },
+    data: formattedNotes,
+  };
+}
   
 }
 
-{/***
-  async searchOrganizations({per_page, page, search }) {
-    const skip = (page - 1)*per_page;
-
-    const query = this.organizationRepo
-    .createQueryBuilder('org')
-    .where("LOWER(org.organization_name) LIKE :search", { search: `%${search}%` })
-    .orderBy("org.organization_name", "ASC")
-    .skip(skip)
-    .take(per_page);
-
-  const [result , total] = await query.getManyAndCount();
-
-  const searched = result.map((org) => ({
-    org_id: org.id,
-    name: org.organization_name,
-    country: org.country,
-    state: org.state,
-    city: org.city,
-    pincode: org.pincode,
-    address: org.address,
-    address_line_2: org.address_line_2,
-  }))
-
-  return {
-    success: 'true',
-    message: 'Organization List Fetched',
-    info: {
-      per_page: per_page,
-      page,
-      total,
-      is_next: page * per_page < total,
-    },
-    data: searched,
-  }
-  } */}

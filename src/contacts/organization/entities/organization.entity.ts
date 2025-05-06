@@ -3,6 +3,7 @@
 import { Activity } from 'src/activity/entities/activity.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { Person } from 'src/contacts/person/entities/person.entity';
+import { Note } from 'src/general/notes/entities/notes.entity';
 import { Lead } from 'src/leads/entities/lead.entity';
 import {
   Column,
@@ -82,6 +83,10 @@ export class Organization {
  
   @OneToMany(() => Activity, (activity) => activity.organization)
   activities: Activity[];
+
+  @OneToMany(() => Note, (note) => note.organization)
+notes: Note[];
+
 
   @CreateDateColumn()
   created_at: Date;

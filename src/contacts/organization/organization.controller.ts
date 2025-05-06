@@ -136,24 +136,18 @@ async getOrganizationLeads(
   return await this.orgService.getOrganizationLeads(orgId, +page, +perPage, user);
 }
 
- // @Body() body: LeadListDto,
+//Organization Notes
+@Get('notes/:org_id')
+@UseGuards(JwtAuthGuard)
+async getOrganizationNotes(
+  @Param('org_id') orgId: string,
+  @Query('per_page') perPage: number = 10,
+  @Query('page') page: number = 1,
+) {
+  return this.orgService.getOrganizationNotes(orgId, perPage, page);
+}
 
 
 
 
 }     
-
-{/**
-   @Get('search')
-  @UseGuards(JwtAuthGuard)
-  async searchOrganizations(
-    @Query('per_page') per_page= 10,
-    @Query('page') page=1,
-    @Query('search') search='',
-  ) {
-    return this.orgService.searchOrganizations({
-      per_page: +per_page,
-        page: +page,
-    search,
-    })
-  } */}
