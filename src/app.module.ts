@@ -45,8 +45,9 @@ import { Note } from './general/notes/entities/notes.entity';
         ActivityPurpose,ActivityType,Activity,CustomColumn,Category,Product,Note],
       synchronize: true,
       ssl:{
-        rejectUnauthorized:false, 
+        rejectUnauthorized:false,
       }
+      
     }),  
     AuthModule,
     OrganizationModule,

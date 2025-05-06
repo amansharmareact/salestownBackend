@@ -45,25 +45,12 @@ export class ActivityController {
     };
   }
 
+  @Get('form')
+@UseGuards(JwtAuthGuard) 
+async getActivityForm(@Req() req) {
+  return this.activityService.getActivityForm();
+}
+
+  
+
   }
-
-{/**
-
-
-  @Get()
-@UseGuards(JwtAuthGuard)
-async getAllActivities(
-  @Query() filterDto: ActivityFilterDto,
-  @Req() req
-) {
-  return this.activityService.listActivities(req.user, filterDto);
-}
-}
-
-
-
-
-   @Get('report/form')
-  async getActivityReportForm(@Req() req: any) {
-    return await this.activityService.getActivityReportForm(req.user);
-  } */}

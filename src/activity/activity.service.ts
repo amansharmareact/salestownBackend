@@ -247,131 +247,104 @@ private getIconFromPurpose(purpose: string): string {
   };
   return iconMap[purpose] || 'fa-calendar';
 }
+
+async getActivityForm() {
+  // Fetch Activity Purposes
+  const purposes = await this.activityPurposeRepository.find(); // Inject this repo
+
+  // Fetch Users who have created at least one activity (owners)
+  const owners = await this.activityRepo
+    .createQueryBuilder('activity')
+    .leftJoinAndSelect('activity.owner', 'owner')
+    .select(['owner.user_id', 'owner.name'])
+    .groupBy('owner.user_id')
+    .getRawMany();
+
+  const uniqueOwners = owners.map(o => ({
+    id: o.owner_user_id,
+    name: o.owner_name,
+  }));
+
+  return {
+    success: 'true',
+    message: 'Activity Form',
+    data: [
+      {
+        label: 'Purpose',
+        name: 'purpose',
+        is_required: 1,
+        values: purposes.map(p => ({
+          id: p.id,
+          purpose: p.purpose,
+          icon: p.icon,
+        })),
+        type: 'dropdown',
+      },
+      {
+        label: 'Title',
+        name: 'title',
+        is_required: 1,
+        type: 'text',
+      },
+      {
+        label: 'Date',
+        name: 'date',
+        is_required: 1,
+        type: 'date',
+      },
+      {
+        label: 'To',
+        name: 'to_time',
+        is_required: 1,
+        values: this.generateTimeSlots(),
+        type: 'dropdown',
+      },
+      {
+        label: 'From',
+        name: 'from_time',
+        is_required: 1,
+        values: this.generateTimeSlots(),
+        type: 'dropdown',
+      },
+      {
+        label: 'Description',
+        name: 'activity_note',
+        is_required: 0,
+        type: 'text',
+      },
+      {
+        label: 'Lead',
+        name: 'lead_id',
+        is_required: 0,
+        type: 'dropdown', // values not provided yet
+      },
+      {
+        label: 'Assign Activity To',
+        name: 'owner',
+        is_required: 0,
+        values: uniqueOwners,
+        type: 'dropdown',
+      },
+    ],
+  };
+}
+
+// Helper to generate time slots
+generateTimeSlots() {
+  const times = [];
+  for (let hour = 1; hour < 24; hour++) {
+    for (let min of [0, 30]) {
+      const key = `${hour < 10 ? '0' + hour : hour}:${min === 0 ? '00' : '30'}`;
+      const isPM = hour >= 12;
+      const displayHour = hour > 12 ? hour - 12 : hour;
+      const value = `${displayHour < 10 ? '0' + displayHour : displayHour}:${min === 0 ? '00' : '30'}${isPM ? 'PM' : 'AM'}`;
+   //   times.push({ key, value });
+    }
+  }
+  return times;
+}
+
   
 }
 
-{/***
-
-async listActivities(user: User, filterDto: ActivityFilterDto) {
-    const {
-      per_page = 10,
-      page = 1,
-      search,
-      user_id,
-      start_date,
-      end_date,
-      activity_type,
-      purpose,
-    } = filterDto;
-  
-    const take = Number(per_page);
-    const skip = (Number(page) - 1) * take;
-  
-    const query = this.activityRepo.createQueryBuilder('activity')
-      .leftJoinAndSelect('activity.purpose', 'purpose')
-      .leftJoinAndSelect('activity.owner', 'owner')
-      .leftJoinAndSelect('activity.organization', 'organization')
-      .leftJoinAndSelect('activity.lead', 'lead')
-      .where('1=1');
-  
-    if (search) {
-      query.andWhere('(activity.activity_title ILIKE :search OR activity.report ILIKE :search)', { search: `%${search}%` });
-    }
-  
-    if (user_id) {
-      query.andWhere('activity.owner_id = :user_id', { user_id });
-    }
-  
-    if (start_date) {
-      query.andWhere('activity.date >= :start_date', { start_date });
-    }
-  
-    if (end_date) {
-      query.andWhere('activity.date <= :end_date', { end_date });
-    }
-  
-    if (purpose) {
-      query.andWhere('activity.purpose_id = :purpose', { purpose });
-    }
-  
-    const [data, total] = await query
-      .orderBy('activity.acitivity_id', 'DESC')
-      .skip(skip)
-      .take(take)
-      .getManyAndCount();
-  
-    const transformed = data.map((act) => ({
-      activity_id: act.acitivity_id,
-      purpose: act.purpose?.purpose || null,
-      icon: act.purpose?.icon || null,
-      title: act.activity_title || '',
-      activity_note: act.activity_note || '',
-      activity_date: act.date,
-      activity_time: act.from_time,
-      activity_timestamp: Math.floor(new Date(`${act.date} ${act.from_time}`).getTime() / 1000),
-      lead_title: act.lead?.title || '',
-      organization_name: act.organization?.name || null,
-      report: act.report,
-      updated_at: null, // if you track updates
-      status: act.mark_done,
-      is_assign: 0,
-      created_at: act['created_at']?.toISOString().replace('T', ' ').substring(0, 19) || '',
-      created_time: Math.floor(new Date(act['created_at']).getTime() / 1000),
-      completed_at: '', // set if you store it
-      added_by: act.owner?.user_id || null,
-      owner: act.owner?.name || '',
-    }));
-  
-    return {
-      success: "true",
-      message: "Activity data",
-      details: {
-        is_prev: Number(page) > 1,
-        is_next: total > Number(page) * take,
-        total_data: total,
-        start: skip + 1,
-        end: Math.min(skip + take, total),
-      },
-      data: transformed,
-    };
-  }
-  
-  
-
-
-
-
-
-
-
-
-
-
-   async getActivityReportForm(user: any): Promise<any> {
-    // Fetch custom columns and report-related data
-    const customColumns = await this.customColumnRepo.find({
-      where: { isActive: true },
-    });
-
-    const reportForm = {
-      success: 'true',
-      message: 'Activity Report Form',
-      data: {
-        detail: {
-          label: 'Report',
-          name: 'report',
-          is_required: 0,
-        },
-        custom: customColumns.map((col) => ({
-          id: col.id,
-          label: col.label,
-          type: col.type,
-          options: col.options ? col.options.split(',') : [],
-          is_required: col.isRequired,
-        })),
-      },
-    };
-
-    return reportForm;
-  } */}
 
