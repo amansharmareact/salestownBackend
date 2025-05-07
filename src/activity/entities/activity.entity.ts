@@ -7,7 +7,6 @@ import { User } from 'src/auth/entities/user.entity';
 import { Lead } from 'src/leads/entities/lead.entity';
 import { Organization } from 'src/contacts/organization/entities/organization.entity';
 import { Person } from 'src/contacts/person/entities/person.entity';
-import { CustomColumn } from './custom-column.entity';
 import { ActivityType } from './activity-type.entity';
 
 @Entity()
@@ -66,7 +65,12 @@ created_at: Date;
 @Column({ type: 'timestamp', nullable: true })
 completed_at: Date;
 
-  
+@Column('text', { array: true, nullable: true })
+custom_field_value: string[];
+
+@Column('int', { array: true, nullable: true })
+custom_column_id: number[];
+
   @Column({ nullable: true })
   updated_at: Date;
   

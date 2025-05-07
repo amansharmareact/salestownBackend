@@ -1,10 +1,10 @@
 
-import { Controller, Post, Body, UseGuards, Req, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get, Query, Param } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { ActivityFilterDto} from './dto/list-activity.dto';
-
+import { SubmitReportDto } from './dto/submit-report.dto';
 
 @Controller('activity')
 export class ActivityController {
@@ -51,6 +51,36 @@ async getActivityForm(@Req() req) {
   return this.activityService.getActivityForm();
 }
 
-  
-
+//activity Report Submit
+@UseGuards(JwtAuthGuard)
+@Post('report/submit/:activity_id')
+async submitReport(
+  @Param('activity_id') activityId: number,
+  @Body() body: SubmitReportDto,
+  @Req() req: any,
+) {
+  const userId = req.user.user_id;
+  await this.activityService.submitReport(activityId, body, userId);
+  return {
+    success: "true",
+    message: "Activity Report Submitted"
+  };
+}
   }
+
+  {/***
+      // activity.controller.ts
+@UseGuards(JwtAuthGuard)
+@Post('report/submit/:activity_id')
+async submitReport(
+  @Param('activity_id') activityId: number,
+  @Body() body: SubmitReportDto,
+  @Req() req: any,
+) {
+  const userId = req.user.user_id;
+  await this.activityService.submitReport(activityId, body, userId);
+  return {
+    success: "true",
+    message: "Activity Report Submitted"
+  };
+} */}

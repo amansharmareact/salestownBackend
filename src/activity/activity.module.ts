@@ -12,10 +12,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { ActivityType } from './entities/activity-type.entity';
 import { ActivityPurpose } from './entities/activity-purpose.entity';
 import { Activity } from './entities/activity.entity';
-import { CustomColumn } from './entities/custom-column.entity';
+
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User,Organization,Person,Lead, ActivityType, ActivityPurpose,Activity,CustomColumn]),
+  imports: [TypeOrmModule.forFeature([User,Organization,Person,Lead, ActivityType, ActivityPurpose,Activity]),
 JwtModule.register({}), ],
   controllers: [ActivityController],
   providers: [ActivityService],

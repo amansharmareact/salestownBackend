@@ -1,5 +1,5 @@
 
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, Repository } from 'typeorm';
 import { ActivityPurpose } from './entities/activity-purpose.entity';
@@ -10,10 +10,10 @@ import { Lead } from 'src/leads/entities/lead.entity';
 import { Organization } from 'src/contacts/organization/entities/organization.entity';
 import { PersonService } from 'src/contacts/person/person.service';
 import { Person } from 'src/contacts/person/entities/person.entity';
-import { CustomColumn } from './entities/custom-column.entity';
 import { User } from 'src/auth/entities/user.entity';
 import {  ActivityFilterDto} from './dto/list-activity.dto';
 import * as moment from 'moment';
+import { SubmitReportDto } from './dto/submit-report.dto';
 
 @Injectable()
 export class ActivityService {
@@ -30,10 +30,9 @@ export class ActivityService {
     private readonly orgRepo: Repository<Organization>,
     @InjectRepository(Person)
     private readonly personRepo: Repository<Person>,
-    @InjectRepository(CustomColumn)
-    private readonly customColumnRepo: Repository<CustomColumn>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+
   ) {}
 
   async getFilters() {
@@ -344,7 +343,65 @@ generateTimeSlots() {
   return times;
 }
 
+//Activity Report Submit
+async submitReport(activityId: number, body: SubmitReportDto, userId: string) {
+  const activity = await this.activityRepo.findOne({
+    where: { acitivity_id: activityId },
+    relations: ['owner'],
+  });
+
+  if (!activity) {
+    throw new NotFoundException('Activity not found');
+  }
+
+  // Optional: Only allow owner to submit report
+ // if (activity.owner.user_id !== userId) {
+  //  throw new ForbiddenException('You are not allowed to submit report for this activity');
+  //}
+
+  activity.report = body.report;
+  activity.custom_column_id=body.custom_column_id,
+  activity.custom_field_value=body.custom_field_value,
+  activity.completed_at = new Date();
+  activity.mark_done = 1;
+
+  await this.activityRepo.save(activity);
+
+  // Optional: Save custom_field_value & custom_column_id
+  // You should create a relation table like `ActivityReportCustomField`
+  // to store these if needed
+}
+
+
+
   
 }
 
 
+{/**
+  // activity.service.ts
+async submitReport(activityId: number, body: SubmitReportDto, userId: string) {
+  const activity = await this.activityRepo.findOne({
+    where: { acitivity_id: activityId },
+    relations: ['owner'],
+  });
+
+  if (!activity) {
+    throw new NotFoundException('Activity not found');
+  }
+
+  // Optional: Only allow owner to submit report
+ // if (activity.owner.user_id !== userId) {
+  //  throw new ForbiddenException('You are not allowed to submit report for this activity');
+  //}
+
+  activity.report = body.submit_report;
+  activity.completed_at = new Date();
+  activity.mark_done = 1;
+
+  await this.activityRepo.save(activity);
+
+  // Optional: Save custom_field_value & custom_column_id
+  // You should create a relation table like `ActivityReportCustomField`
+  // to store these if needed
+} */}
